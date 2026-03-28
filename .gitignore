@@ -1,0 +1,8 @@
+.venv/
+data/
+*.csv
+*.npz
+*.npy
+*.joblib
+*.pkl
+

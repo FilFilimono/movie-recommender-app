@@ -1,5 +1,7 @@
 .venv/
 
+.vscode/
+
 *.csv
 *.npz
 *.npy

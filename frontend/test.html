@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch — Ваши предпочтения</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1c1c27;
+            --border: #2a2a3a;
+            --accent: #e8b34b;
+            --accent2: #c97d3f;
+            --text: #f0eeea;
+            --muted: #6b6b80;
+            --radius: 12px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 80% 10%, rgba(232, 179, 75, .06) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 60% at 0% 90%, rgba(100, 60, 180, .04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 48px;
+            background: rgba(10, 10, 15, .85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: .1em;
+            color: var(--accent);
+        }
+
+        .logo span {
+            color: var(--text);
+        }
+
+        .nav-user {
+            font-size: .82rem;
+            color: var(--muted);
+        }
+
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 60px 24px 100px;
+        }
+
+        /* Progress */
+        .progress-wrap {
+            margin-bottom: 48px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-size: .78rem;
+            color: var(--muted);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .progress-count {
+            font-size: .78rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 3px;
+            background: var(--surface2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width .5s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        /* Steps */
+        .step {
+            display: none;
+            animation: stepIn .4s ease both;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes stepIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        .step-eyebrow {
+            font-size: .72rem;
+            color: var(--accent);
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            line-height: 1;
+            letter-spacing: .04em;
+            margin-bottom: 8px;
+        }
+
+        .step-desc {
+            font-size: .9rem;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 32px;
+            max-width: 500px;
+        }
+
+        /* Genre grid */
+        .genre-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .genre-card {
+            padding: 16px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all .18s;
+            text-align: center;
+            user-select: none;
+        }
+
+        .genre-card:hover {
+            border-color: var(--accent);
+            background: var(--surface2);
+        }
+
+        .genre-card.selected {
+            border-color: var(--accent);
+            background: rgba(232, 179, 75, .1);
+        }
+
+        .genre-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .genre-name {
+            font-size: .82rem;
+            font-weight: 500;
+        }
+
+        /* Year range */
+        .range-wrap {
+            margin-bottom: 40px;
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: .78rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .range-display {
+            text-align: center;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            color: var(--accent);
+            letter-spacing: .06em;
+            margin-bottom: 16px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 4px;
+            background: var(--surface2);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid var(--bg);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+
+        .dual-range {
+            position: relative;
+            height: 24px;
+            margin-bottom: 16px;
+        }
+
+        .dual-range input {
+            position: absolute;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .dual-range input::-webkit-slider-thumb {
+            pointer-events: auto;
+        }
+
+        /* Rating stars */
+        .rating-wrap {
+            margin-bottom: 40px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .star {
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .star.lit {
+            background: rgba(232, 179, 75, .15);
+            border-color: var(--accent);
+        }
+
+        .rating-label {
+            font-size: .85rem;
+            color: var(--muted);
+        }
+
+        .rating-label span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Cast input */
+        .tag-input-wrap {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            cursor: text;
+            transition: border-color .2s;
+            margin-bottom: 12px;
+        }
+
+        .tag-input-wrap:focus-within {
+            border-color: var(--accent);
+        }
+
+        .tag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(232, 179, 75, .15);
+            border: 1px solid rgba(232, 179, 75, .4);
+            border-radius: 20px;
+            font-size: .8rem;
+            color: var(--accent);
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            opacity: .6;
+            font-size: 1rem;
+        }
+
+        .tag-remove:hover {
+            opacity: 1;
+        }
+
+        .tag-input-wrap input {
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            font-size: .9rem;
+            min-width: 160px;
+            flex: 1;
+            padding: 2px 4px;
+        }
+
+        .tag-hint {
+            font-size: .78rem;
+            color: var(--muted);
+        }
+
+        /* Certification chips */
+        .cert-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .cert-chip {
+            padding: 8px 18px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+            cursor: pointer;
+            font-size: .82rem;
+            font-weight: 500;
+            transition: all .18s;
+        }
+
+        .cert-chip:hover {
+            border-color: var(--accent);
+        }
+
+        .cert-chip.selected {
+            background: rgba(232, 179, 75, .12);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Navigation buttons */
+        .step-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .btn-back {
+            padding: 12px 24px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-back:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+
+        .btn-next {
+            padding: 13px 32px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius);
+            color: #0a0a0f;
+            font-family: 'Manrope', sans-serif;
+            font-size: .88rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-next:hover {
+            background: var(--accent2);
+            transform: translateY(-1px);
+        }
+
+        .btn-next .arrow {
+            font-size: 1rem;
+        }
+
+        .skip-btn {
+            font-size: .78rem;
+            color: var(--muted);
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            background: none;
+            border: none;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .skip-btn:hover {
+            color: var(--text);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">Cine<span>Match</span></div>
+        <div class="nav-user" id="nav-username">Привет, гость</div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Progress -->
+        <div class="progress-wrap">
+            <div class="progress-header">
+                <span class="progress-label">Настройка вкуса</span>
+                <span class="progress-count" id="prog-count">1 / 5</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="prog-fill" style="width:20%"></div>
+            </div>
+        </div>
+
+        <!-- STEP 1: Genres -->
+        <div class="step active" id="step-1">
+            <div class="step-eyebrow">Шаг 1</div>
+            <div class="step-title">Любимые жанры</div>
+            <div class="step-desc">Выберите всё, что вам нравится. Можно несколько.</div>
+
+            <div class="genre-grid">
+                <div class="genre-card" data-genre="Action" onclick="toggleGenre(this)">
+                    <span class="genre-icon">⚡</span>
+                    <div class="genre-name">Боевик</div>
+                </div>
+                <div class="genre-card" data-genre="Comedy" onclick="toggleGenre(this)">
+                    <span class="genre-icon">😄</span>
+                    <div class="genre-name">Комедия</div>
+                </div>
+                <div class="genre-card" data-genre="Drama" onclick="toggleGenre(this)">
+                    <span class="genre-icon">🎭</span>
+                    <div class="genre-name">Драма</div>
+                </div>
+                <div class="genre-card" data-genre="Thriller" onclick="toggleGenre(this)">
+                    <span class="genre-icon">🔪</span>
+                    <div class="genre-name">Триллер</div>
+                </div>
+                <div class="genre-card" data-genre="Science Fiction" onclick="toggleGenre(this)">
+                    <span class="genre-icon">🚀</span>
+                    <div class="genre-name">Фантастика</div>
+                </div>
+                <div class="genre-card" data-genre="Horror" onclick="toggleGenre(this)">
+                    <span class="genre-icon">👻</span>
+                    <div class="genre-name">Ужасы</div>
+                </div>
+                <div class="genre-card" data-genre="Romance" onclick="toggleGenre(this)">
+                    <span class="genre-icon">❤️</span>
+                    <div class="genre-name">Романтика</div>
+                </div>
+                <div class="genre-card" data-genre="Animation" onclick="toggleGenre(this)">
+                    <span class="genre-icon">🎨</span>
+                    <div class="genre-name">Анимация</div>
+                </div>
+                <div class="genre-card" data-genre="Adventure" onclick="toggleGenre(this)">
+                    <span class="genre-icon">🗺️</span>
+                    <div class="genre-name">Приключения</div>
+                </div>
+                <div class="genre-card" data-genre="Crime" onclick="toggleGenre(this)">
+                    <span class="genre-icon">🕵️</span>
+                    <div class="genre-name">Криминал</div>
+                </div>
+                <div class="genre-card" data-genre="Documentary" onclick="toggleGenre(this)">
+                    <span class="genre-icon">🎬</span>
+                    <div class="genre-name">Документальный</div>
+                </div>
+                <div class="genre-card" data-genre="Fantasy" onclick="toggleGenre(this)">
+                    <span class="genre-icon">🧙</span>
+                    <div class="genre-name">Фэнтези</div>
+                </div>
+            </div>
+
+            <div class="step-nav">
+                <span></span>
+                <div style="display:flex;align-items:center;gap:16px">
+                    <button class="skip-btn" onclick="nextStep()">Пропустить</button>
+                    <button class="btn-next" onclick="nextStep()">Далее <span class="arrow">→</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: Years -->
+        <div class="step" id="step-2">
+            <div class="step-eyebrow">Шаг 2</div>
+            <div class="step-title">Период выхода</div>
+            <div class="step-desc">За какие годы вас интересуют фильмы?</div>
+
+            <div class="range-wrap">
+                <div class="range-display" id="year-display">2000 — 2024</div>
+                <div class="range-labels">
+                    <span>1970</span><span>2024</span>
+                </div>
+                <div style="margin-bottom:16px">
+                    <label
+                        style="font-size:.78rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:8px;">От
+                        года</label>
+                    <input type="range" id="year-from" min="1970" max="2024" value="2000" oninput="updateYears()">
+                </div>
+                <div>
+                    <label
+                        style="font-size:.78rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:8px;">До
+                        года</label>
+                    <input type="range" id="year-to" min="1970" max="2024" value="2024" oninput="updateYears()">
+                </div>
+            </div>
+
+            <div class="step-nav">
+                <button class="btn-back" onclick="prevStep()">← Назад</button>
+                <div style="display:flex;align-items:center;gap:16px">
+                    <button class="skip-btn" onclick="nextStep()">Пропустить</button>
+                    <button class="btn-next" onclick="nextStep()">Далее <span class="arrow">→</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Rating -->
+        <div class="step" id="step-3">
+            <div class="step-eyebrow">Шаг 3</div>
+            <div class="step-title">Минимальный рейтинг</div>
+            <div class="step-desc">Ниже какого рейтинга фильмы вам не интересны?</div>
+
+            <div class="rating-wrap">
+                <div class="stars" id="stars">
+                    <div class="star" data-val="2" onclick="setRating(2)">★</div>
+                    <div class="star" data-val="4" onclick="setRating(4)">★</div>
+                    <div class="star" data-val="5" onclick="setRating(5)">★</div>
+                    <div class="star" data-val="6" onclick="setRating(6)">★</div>
+                    <div class="star" data-val="7" onclick="setRating(7)">★</div>
+                    <div class="star" data-val="8" onclick="setRating(8)">★</div>
+                    <div class="star" data-val="9" onclick="setRating(9)">★</div>
+                </div>
+                <div class="rating-label">Минимальный рейтинг: <span id="rating-val">не задан</span></div>
+            </div>
+
+            <div class="step-nav">
+                <button class="btn-back" onclick="prevStep()">← Назад</button>
+                <div style="display:flex;align-items:center;gap:16px">
+                    <button class="skip-btn" onclick="nextStep()">Пропустить</button>
+                    <button class="btn-next" onclick="nextStep()">Далее <span class="arrow">→</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Cast/Director -->
+        <div class="step" id="step-4">
+            <div class="step-eyebrow">Шаг 4</div>
+            <div class="step-title">Любимые актёры</div>
+            <div class="step-desc">Введите имена актёров или режиссёра и нажмите Enter.</div>
+
+            <div style="margin-bottom:28px">
+                <label
+                    style="font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px;">Актёры</label>
+                <div class="tag-input-wrap" id="cast-wrap" onclick="document.getElementById('cast-input').focus()">
+                    <input type="text" id="cast-input" placeholder="Например: Leonardo DiCaprio"
+                        onkeydown="handleTagInput(event,'cast')">
+                </div>
+                <div class="tag-hint">Нажмите Enter чтобы добавить</div>
+            </div>
+
+            <div>
+                <label
+                    style="font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px;">Режиссёр</label>
+                <div class="tag-input-wrap" id="dir-wrap" onclick="document.getElementById('dir-input').focus()">
+                    <input type="text" id="dir-input" placeholder="Например: Christopher Nolan"
+                        onkeydown="handleTagInput(event,'dir')">
+                </div>
+            </div>
+
+            <div class="step-nav" style="margin-top:32px">
+                <button class="btn-back" onclick="prevStep()">← Назад</button>
+                <div style="display:flex;align-items:center;gap:16px">
+                    <button class="skip-btn" onclick="nextStep()">Пропустить</button>
+                    <button class="btn-next" onclick="nextStep()">Далее <span class="arrow">→</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 5: Certification + Runtime -->
+        <div class="step" id="step-5">
+            <div class="step-eyebrow">Шаг 5</div>
+            <div class="step-title">Последние штрихи</div>
+            <div class="step-desc">Почти готово — ещё пара деталей для точности.</div>
+
+            <div style="margin-bottom:28px">
+                <label
+                    style="font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:12px;">Возрастной
+                    рейтинг</label>
+                <div class="cert-row" id="cert-row">
+                    <div class="cert-chip" data-cert="G" onclick="toggleCert(this)">G</div>
+                    <div class="cert-chip" data-cert="PG" onclick="toggleCert(this)">PG</div>
+                    <div class="cert-chip" data-cert="PG-13" onclick="toggleCert(this)">PG-13</div>
+                    <div class="cert-chip" data-cert="R" onclick="toggleCert(this)">R</div>
+                    <div class="cert-chip" data-cert="NC-17" onclick="toggleCert(this)">NC-17</div>
+                    <div class="cert-chip selected" data-cert="" onclick="toggleCert(this)">Любой</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom:40px">
+                <label
+                    style="font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:12px;">Максимальный
+                    хронометраж</label>
+                <div class="range-display" id="runtime-display" style="font-size:2.5rem;text-align:left;">3 ч 00 мин
+                </div>
+                <input type="range" id="runtime" min="60" max="240" value="180" oninput="updateRuntime()">
+                <div class="range-labels"><span>1 ч</span><span>4 ч</span></div>
+            </div>
+
+            <div class="step-nav">
+                <button class="btn-back" onclick="prevStep()">← Назад</button>
+                <button class="btn-next" onclick="submitPreferences()" style="background:var(--accent);gap:10px;">
+                    🎬 Найти фильмы
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        // State
+        const prefs = {
+            genres: [], cast: [], director: '',
+            year_from: 2000, year_to: 2024,
+            min_rating: null, max_runtime: 180, certification: ''
+        };
+
+        // Nav
+        document.getElementById('nav-username').textContent =
+            'Привет, ' + (localStorage.getItem('user') || 'гость');
+
+        function goToStep(n) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-' + n).classList.add('active');
+            currentStep = n;
+            const pct = (n / totalSteps) * 100;
+            document.getElementById('prog-fill').style.width = pct + '%';
+            document.getElementById('prog-count').textContent = n + ' / ' + totalSteps;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function nextStep() { if (currentStep < totalSteps) goToStep(currentStep + 1); }
+        function prevStep() { if (currentStep > 1) goToStep(currentStep - 1); }
+
+        // Genres
+        function toggleGenre(el) {
+            el.classList.toggle('selected');
+            const g = el.dataset.genre;
+            if (el.classList.contains('selected')) prefs.genres.push(g);
+            else prefs.genres = prefs.genres.filter(x => x !== g);
+        }
+
+        // Years
+        function updateYears() {
+            let f = +document.getElementById('year-from').value;
+            let t = +document.getElementById('year-to').value;
+            if (f > t) { let tmp = f; f = t; t = tmp; }
+            prefs.year_from = f; prefs.year_to = t;
+            document.getElementById('year-display').textContent = f + ' — ' + t;
+        }
+
+        // Rating
+        let currentRating = null;
+        function setRating(val) {
+            currentRating = val;
+            prefs.min_rating = val;
+            document.querySelectorAll('.star').forEach(s => {
+                s.classList.toggle('lit', +s.dataset.val <= val);
+            });
+            const labels = { 2: '2.0+', 4: '4.0+', 5: '5.0+', 6: '6.0+', 7: '7.0+', 8: '8.0+', 9: '9.0+' };
+            document.getElementById('rating-val').textContent = labels[val] || val + '.0+';
+        }
+
+        // Runtime
+        function updateRuntime() {
+            const v = +document.getElementById('runtime').value;
+            prefs.max_runtime = v;
+            const h = Math.floor(v / 60), m = v % 60;
+            document.getElementById('runtime-display').textContent =
+                h + ' ч ' + String(m).padStart(2, '0') + ' мин';
+        }
+
+        // Tags (cast/director)
+        const castTags = [], dirTags = [];
+        function handleTagInput(e, type) {
+            if (e.key !== 'Enter') return;
+            const inp = document.getElementById(type === ('cast') ? 'cast-input' : 'dir-input');
+            const val = inp.value.trim();
+            if (!val) return;
+            inp.value = '';
+            if (type === 'cast') { castTags.push(val); renderTags('cast-wrap', 'cast-input', castTags, 'cast'); }
+            else { dirTags.length = 0; dirTags.push(val); renderTags('dir-wrap', 'dir-input', dirTags, 'dir'); }
+        }
+        function renderTags(wrapId, inputId, arr, type) {
+            const wrap = document.getElementById(wrapId);
+            const inp = document.getElementById(inputId);
+            wrap.innerHTML = '';
+            arr.forEach((t, i) => {
+                const tag = document.createElement('div');
+                tag.className = 'tag';
+                tag.innerHTML = `${t}<span class="tag-remove" onclick="removeTag(${i},'${type}')">×</span>`;
+                wrap.appendChild(tag);
+            });
+            wrap.appendChild(inp);
+            if (type === 'cast') prefs.cast = [...arr];
+            else prefs.director = arr[0] || '';
+        }
+        function removeTag(i, type) {
+            if (type === 'cast') { castTags.splice(i, 1); renderTags('cast-wrap', 'cast-input', castTags, 'cast'); }
+            else { dirTags.splice(i, 1); renderTags('dir-wrap', 'dir-input', dirTags, 'dir'); }
+        }
+
+        // Cert
+        function toggleCert(el) {
+            document.querySelectorAll('.cert-chip').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            prefs.certification = el.dataset.cert;
+        }
+
+        // Submit
+        function submitPreferences() {
+            // ЗАГЛУШКА — здесь будет:
+            // 1. fetch('/api/preferences', { method:'POST', body: JSON.stringify(prefs) })
+            // 2. потом redirect на recommendations.html
+            console.log('Preferences:', prefs);
+            localStorage.setItem('prefs', JSON.stringify(prefs));
+            window.location.href = 'recommendations.html';
+        }
+    </script>
+</body>
+
+</html>

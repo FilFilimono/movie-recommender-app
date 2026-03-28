@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch — Войти</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1c1c27;
+            --border: #2a2a3a;
+            --accent: #e8b34b;
+            --accent2: #c97d3f;
+            --text: #f0eeea;
+            --muted: #6b6b80;
+            --danger: #e05252;
+            --radius: 12px;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            overflow: hidden
+        }
+
+        /* Background film grain + gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 70% 20%, rgba(232, 179, 75, 0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 10% 80%, rgba(130, 80, 200, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Noise texture */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: .6;
+        }
+
+        .layout {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+        }
+
+        /* LEFT — brand panel */
+        .brand-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px 56px;
+            border-right: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(232, 179, 75, 0.04) 0%, transparent 50%);
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            position: relative;
+        }
+
+        .logo span {
+            color: var(--text);
+        }
+
+        .tagline {
+            position: relative;
+        }
+
+        .tagline h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 5.5rem;
+            line-height: 0.92;
+            letter-spacing: 0.04em;
+            color: var(--text);
+            margin-bottom: 24px;
+        }
+
+        .tagline h1 em {
+            font-style: normal;
+            -webkit-text-stroke: 1px var(--accent);
+            color: transparent;
+        }
+
+        .tagline p {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 340px;
+            font-weight: 300;
+        }
+
+        .film-strip {
+            display: flex;
+            gap: 8px;
+            position: relative;
+        }
+
+        .film-card {
+            flex: 1;
+            height: 90px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .film-card::after {
+            content: attr(data-title);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .8));
+            padding: 18px 8px 6px;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, .5);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .fc1 {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+
+        .fc2 {
+            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+        }
+
+        .fc3 {
+            background: linear-gradient(135deg, #1a0a0a, #2e1515);
+        }
+
+        .fc4 {
+            background: linear-gradient(135deg, #0a1a0a, #152e15);
+        }
+
+        /* RIGHT — auth panel */
+        .auth-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 4px;
+            margin-bottom: 32px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+            letter-spacing: 0.02em;
+        }
+
+        .tab-btn.active {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .form-subtitle {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .field input:focus {
+            border-color: var(--accent);
+        }
+
+        .field input::placeholder {
+            color: var(--muted);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius);
+            color: #0a0a0f;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all .2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent2);
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .error-msg {
+            display: none;
+            padding: 10px 14px;
+            background: rgba(224, 82, 82, .1);
+            border: 1px solid rgba(224, 82, 82, .3);
+            border-radius: 8px;
+            color: var(--danger);
+            font-size: 0.82rem;
+            margin-bottom: 14px;
+        }
+
+        /* Animated entrance */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .auth-box {
+            animation: fadeUp .5s ease both;
+        }
+
+        .brand-panel .tagline {
+            animation: fadeUp .6s .1s ease both;
+        }
+
+        .film-strip {
+            animation: fadeUp .6s .2s ease both;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+
+        <!-- LEFT PANEL -->
+        <div class="brand-panel">
+            <div class="logo">Cine<span>Match</span></div>
+
+            <div class="tagline">
+                <h1>Твоё кино<br>тебя <em>ждёт</em></h1>
+                <p>Умная рекомендательная система, которая знает твой вкус лучше, чем ты сам.</p>
+            </div>
+
+            <div class="film-strip">
+                <div class="film-card fc1" data-title="Драма"></div>
+                <div class="film-card fc2" data-title="Триллер"></div>
+                <div class="film-card fc3" data-title="Фантастика"></div>
+                <div class="film-card fc4" data-title="Комедия"></div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="auth-panel">
+            <div class="auth-box">
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('login')">Войти</button>
+                    <button class="tab-btn" onclick="switchTab('register')">Регистрация</button>
+                </div>
+
+                <!-- LOGIN -->
+                <div class="form-section active" id="login">
+                    <div class="form-title">Добро пожаловать</div>
+                    <div class="form-subtitle">Войдите, чтобы получить персональные рекомендации</div>
+                    <div class="error-msg" id="login-error">Неверный логин или пароль</div>
+                    <div class="field">
+                        <label>Имя пользователя</label>
+                        <input type="text" placeholder="username" id="login-username">
+                    </div>
+                    <div class="field">
+                        <label>Пароль</label>
+                        <input type="password" placeholder="••••••••" id="login-password">
+                    </div>
+                    <button class="btn-primary" onclick="handleLogin()">Войти</button>
+                </div>
+
+                <!-- REGISTER -->
+                <div class="form-section" id="register">
+                    <div class="form-title">Создать аккаунт</div>
+                    <div class="form-subtitle">Пройдите короткий тест и получите идеальные рекомендации</div>
+                    <div class="error-msg" id="reg-error">Пользователь уже существует</div>
+                    <div class="field">
+                        <label>Имя пользователя</label>
+                        <input type="text" placeholder="username" id="reg-username">
+                    </div>
+                    <div class="field">
+                        <label>Пароль</label>
+                        <input type="password" placeholder="••••••••" id="reg-password">
+                    </div>
+                    <div class="field">
+                        <label>Повтор пароля</label>
+                        <input type="password" placeholder="••••••••" id="reg-confirm">
+                    </div>
+                    <button class="btn-primary" onclick="handleRegister()">Создать аккаунт</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+            });
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            if (!username || !password) return;
+
+            // ЗАГЛУШКА — здесь будет fetch('/api/login', ...)
+            // Симулируем успех
+            localStorage.setItem('user', username);
+            window.location.href = 'onboarding.html';
+        }
+
+        function handleRegister() {
+            const username = document.getElementById('reg-username').value;
+            const pass = document.getElementById('reg-password').value;
+            const confirm = document.getElementById('reg-confirm').value;
+            if (!username || !pass) return;
+            if (pass !== confirm) {
+                document.getElementById('reg-error').style.display = 'block';
+                document.getElementById('reg-error').textContent = 'Пароли не совпадают';
+                return;
+            }
+
+            // ЗАГЛУШКА — здесь будет fetch('/api/register', ...)
+            localStorage.setItem('user', username);
+            window.location.href = 'onboarding.html';
+        }
+    </script>
+</body>
+
+</html>

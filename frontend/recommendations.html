@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch — Рекомендации</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1c1c27;
+            --border: #2a2a3a;
+            --accent: #e8b34b;
+            --accent2: #c97d3f;
+            --text: #f0eeea;
+            --muted: #6b6b80;
+            --radius: 12px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(232, 179, 75, .05) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 48px;
+            background: rgba(10, 10, 15, .9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: .1em;
+            color: var(--accent);
+        }
+
+        .logo span {
+            color: var(--text);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-user {
+            font-size: .82rem;
+            color: var(--muted);
+        }
+
+        .btn-retake {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-retake:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* Header */
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-eyebrow {
+            font-size: .72rem;
+            color: var(--accent);
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            letter-spacing: .04em;
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            font-size: .9rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-chip {
+            padding: 7px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .15s;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-chip.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(232, 179, 75, .08);
+        }
+
+        .filter-chip:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+
+        /* Sort control */
+        .list-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .results-count {
+            font-size: .82rem;
+            color: var(--muted);
+        }
+
+        .results-count span {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .sort-select {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            font-size: .8rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Movie grid */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .movie-card:hover {
+            border-color: rgba(232, 179, 75, .4);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, .4);
+        }
+
+        .poster {
+            aspect-ratio: 2/3;
+            background: var(--surface2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform .3s;
+        }
+
+        .movie-card:hover .poster img {
+            transform: scale(1.04);
+        }
+
+        .poster-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--border);
+        }
+
+        .score-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(10, 10, 15, .85);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(232, 179, 75, .3);
+            border-radius: 6px;
+            padding: 3px 7px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .like-btn {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(10, 10, 15, .7);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: all .2s;
+            opacity: 0;
+        }
+
+        .movie-card:hover .like-btn {
+            opacity: 1;
+        }
+
+        .like-btn.liked {
+            opacity: 1;
+            background: rgba(232, 75, 75, .2);
+            border-color: rgba(232, 75, 75, .5);
+        }
+
+        .card-body {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-title {
+            font-size: .88rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .card-meta {
+            font-size: .74rem;
+            color: var(--muted);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .card-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        .card-genres {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .genre-tag {
+            font-size: .64rem;
+            padding: 2px 7px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--muted);
+        }
+
+        /* Similarity bar */
+        .sim-bar {
+            height: 2px;
+            background: var(--surface2);
+            border-radius: 1px;
+            margin-top: 8px;
+        }
+
+        .sim-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 1px;
+        }
+
+        .sim-label {
+            font-size: .66rem;
+            color: var(--muted);
+            margin-top: 3px;
+            text-align: right;
+        }
+
+        /* Loading skeleton */
+        .skeleton {
+            background: var(--surface2);
+            border-radius: 4px;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                opacity: .4
+            }
+
+            50% {
+                opacity: .7
+            }
+        }
+
+        /* Empty state */
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: .88rem;
+            color: var(--muted);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 48px;
+        }
+
+        .page-btn {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            font-size: .85rem;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(232, 179, 75, .1);
+        }
+
+        .page-btn:hover:not(.active) {
+            border-color: var(--text);
+            color: var(--text);
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">Cine<span>Match</span></div>
+        <div class="nav-right">
+            <div class="nav-user" id="nav-user">...</div>
+            <a href="onboarding.html" class="btn-retake">⚙ Пересмотреть вкус</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="page-eyebrow">Персональные рекомендации</div>
+            <div class="page-title">Подобрано для вас</div>
+            <div class="page-subtitle" id="pref-summary">Загружаем ваши предпочтения...</div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+            <div class="filter-chip active" data-filter="all" onclick="setFilter('all',this)">Все жанры</div>
+            <div class="filter-chip" data-filter="Action" onclick="setFilter('Action',this)">⚡ Боевик</div>
+            <div class="filter-chip" data-filter="Drama" onclick="setFilter('Drama',this)">🎭 Драма</div>
+            <div class="filter-chip" data-filter="Comedy" onclick="setFilter('Comedy',this)">😄 Комедия</div>
+            <div class="filter-chip" data-filter="Thriller" onclick="setFilter('Thriller',this)">🔪 Триллер</div>
+            <div class="filter-chip" data-filter="Science Fiction" onclick="setFilter('Science Fiction',this)">🚀
+                Фантастика</div>
+            <div class="filter-chip" data-filter="Crime" onclick="setFilter('Crime',this)">🕵️ Криминал</div>
+        </div>
+
+        <div class="list-controls">
+            <div class="results-count">Найдено: <span id="count">—</span> фильмов</div>
+            <select class="sort-select" onchange="sortMovies(this.value)">
+                <option value="similarity">По совпадению</option>
+                <option value="rating">По рейтингу</option>
+                <option value="year">По году</option>
+            </select>
+        </div>
+
+        <div class="movies-grid" id="movies-grid">
+            <!-- Skeleton placeholders -->
+            <div style="animation:cardIn .3s ease both"></div>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script>
+        // ЗАГЛУШКА — моковые данные вместо fetch('/api/recommendations')
+        const MOCK_MOVIES = [
+            { id: 1, title: "Inception", year: 2010, rating: 8.8, genres: ["Sci-Fi", "Thriller"], similarity: 0.96, poster_url: "https://image.tmdb.org/t/p/w300/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg" },
+            { id: 2, title: "Interstellar", year: 2014, rating: 8.6, genres: ["Sci-Fi", "Drama"], similarity: 0.93, poster_url: "https://image.tmdb.org/t/p/w300/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" },
+            { id: 3, title: "The Dark Knight", year: 2008, rating: 9.0, genres: ["Action", "Crime"], similarity: 0.91, poster_url: "https://image.tmdb.org/t/p/w300/qJ2tW6WMUDux911r6m7haRef0WH.jpg" },
+            { id: 4, title: "Parasite", year: 2019, rating: 8.5, genres: ["Drama", "Thriller"], similarity: 0.89, poster_url: "https://image.tmdb.org/t/p/w300/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg" },
+            { id: 5, title: "The Godfather", year: 1972, rating: 9.2, genres: ["Crime", "Drama"], similarity: 0.87, poster_url: "https://image.tmdb.org/t/p/w300/3bhkrj58Vtu7enYsLeBh4zu7She.jpg" },
+            { id: 6, title: "Pulp Fiction", year: 1994, rating: 8.9, genres: ["Crime", "Drama"], similarity: 0.85, poster_url: "https://image.tmdb.org/t/p/w300/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg" },
+            { id: 7, title: "The Matrix", year: 1999, rating: 8.7, genres: ["Sci-Fi", "Action"], similarity: 0.83, poster_url: "https://image.tmdb.org/t/p/w300/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg" },
+            { id: 8, title: "Whiplash", year: 2014, rating: 8.5, genres: ["Drama", "Music"], similarity: 0.81, poster_url: "https://image.tmdb.org/t/p/w300/7fn624j5lj3xTme2SgiLCeuedmO.jpg" },
+            { id: 9, title: "Gladiator", year: 2000, rating: 8.5, genres: ["Action", "Drama"], similarity: 0.79, poster_url: "https://image.tmdb.org/t/p/w300/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg" },
+            { id: 10, title: "Fight Club", year: 1999, rating: 8.8, genres: ["Drama", "Thriller"], similarity: 0.77, poster_url: "https://image.tmdb.org/t/p/w300/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg" },
+            { id: 11, title: "Joker", year: 2019, rating: 8.4, genres: ["Crime", "Drama"], similarity: 0.75, poster_url: "https://image.tmdb.org/t/p/w300/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg" },
+            { id: 12, title: "1917", year: 2019, rating: 8.3, genres: ["Drama", "War"], similarity: 0.73, poster_url: "https://image.tmdb.org/t/p/w300/iZf0KyrE25z1sage4SYFLCCrMi9.jpg" },
+        ];
+
+        let allMovies = [...MOCK_MOVIES];
+        let displayedMovies = [...MOCK_MOVIES];
+        let currentFilter = 'all';
+        let liked = new Set();
+
+        document.getElementById('nav-user').textContent =
+            'Привет, ' + (localStorage.getItem('user') || 'гость');
+
+        // Summary
+        const prefs = JSON.parse(localStorage.getItem('prefs') || '{}');
+        const summary = [];
+        if (prefs.genres?.length) summary.push(prefs.genres.join(', '));
+        if (prefs.year_from) summary.push(prefs.year_from + '–' + (prefs.year_to || '2024'));
+        if (prefs.min_rating) summary.push('рейтинг ' + prefs.min_rating + '+');
+        document.getElementById('pref-summary').textContent =
+            summary.length ? 'По критериям: ' + summary.join(' · ') : 'Топ фильмы по вашим вкусам';
+
+        function setFilter(genre, el) {
+            currentFilter = genre;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            applyFilter();
+        }
+
+        function applyFilter() {
+            if (currentFilter === 'all') displayedMovies = [...allMovies];
+            else displayedMovies = allMovies.filter(m => m.genres.some(g => g.includes(currentFilter)));
+            renderMovies();
+        }
+
+        function sortMovies(by) {
+            if (by === 'rating') displayedMovies.sort((a, b) => b.rating - a.rating);
+            else if (by === 'year') displayedMovies.sort((a, b) => b.year - a.year);
+            else displayedMovies.sort((a, b) => b.similarity - a.similarity);
+            renderMovies();
+        }
+
+        function toggleLike(id, el, e) {
+            e.preventDefault(); e.stopPropagation();
+            if (liked.has(id)) { liked.delete(id); el.textContent = '♡'; el.classList.remove('liked'); }
+            else { liked.add(id); el.textContent = '♥'; el.classList.add('liked'); }
+            // ЗАГЛУШКА — здесь будет fetch('/api/like', {method:'POST', body:JSON.stringify({movie_id:id})})
+        }
+
+        function renderMovies() {
+            const grid = document.getElementById('movies-grid');
+            document.getElementById('count').textContent = displayedMovies.length;
+
+            if (!displayedMovies.length) {
+                grid.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🎬</div>
+      <div class="empty-title">Ничего не найдено</div>
+      <div class="empty-desc">Попробуйте изменить фильтр или обновить вкусы</div>
+    </div>`;
+                return;
+            }
+
+            grid.innerHTML = displayedMovies.map((m, i) => `
+    <a class="movie-card" href="movie.html?id=${m.id}"
+       style="animation:cardIn .3s ${i * 0.04}s ease both">
+      <div class="poster">
+        ${m.poster_url
+                    ? `<img src="${m.poster_url}" alt="${m.title}" loading="lazy" onerror="this.style.display='none'">`
+                    : `<div class="poster-placeholder">🎬</div>`}
+        <div class="score-badge">★ ${m.rating}</div>
+        <div class="like-btn ${liked.has(m.id) ? 'liked' : ''}"
+             onclick="toggleLike(${m.id},this,event)">
+          ${liked.has(m.id) ? '♥' : '♡'}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${m.title}</div>
+        <div class="card-meta">
+          <span>${m.year}</span>
+          <span class="card-dot"></span>
+          <span>${m.rating} / 10</span>
+        </div>
+        <div class="card-genres">
+          ${m.genres.slice(0, 2).map(g => `<span class="genre-tag">${g}</span>`).join('')}
+        </div>
+        <div class="sim-bar">
+          <div class="sim-fill" style="width:${Math.round(m.similarity * 100)}%"></div>
+        </div>
+        <div class="sim-label">Совпадение ${Math.round(m.similarity * 100)}%</div>
+      </div>
+    </a>
+  `).join('');
+        }
+
+        renderMovies();
+    </script>
+</body>
+
+</html>

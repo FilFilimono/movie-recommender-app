@@ -9,3 +9,16 @@
 *.pkl
 
 .DS_Store
+
+__pycache__/
+*.py[cod]
+*.pyc
+
+
+
+*.db
+*.sqlite
+*.sqlite3
+
+
+test.py

@@ -26,10 +26,12 @@ class UserRepository:
         
     
     def get_user_by_id(self, user_id) -> User | None:
-        return self.db_manager.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        row = self.db_manager.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()    
+        return self._row_to_user(row) 
     
     def get_user_by_username(self, username) -> User | None:
-        return self.db_manager.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+        row =  self.db_manager.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+        return self._row_to_user(row)
     
     def exists_user(self, username) -> bool:
         return self.db_manager.execute("SELECT COUNT(*) FROM users WHERE username = ?", (username,)).fetchone()[0] > 0

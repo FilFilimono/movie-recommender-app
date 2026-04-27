@@ -24,3 +24,6 @@ __pycache__/
 test.py
 test_password.py
 test_auth_service.py
+test_ml.py
+
+data/model/

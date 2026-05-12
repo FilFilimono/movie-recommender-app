@@ -25,19 +25,19 @@ class Movie:
         self.runtime = runtime
         self.rating = rating
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
-            "movie_id": self.movie_id,
-            "title": self.title,
-            "similarity": self.similarity,
-            "poster_url": self.poster_url,
-            "overview": self.overview,
-            "genres": self.genres,
-            "cast": self.cast,
-            "director": self.director,
-            "release_year": self.release_year,
-            "runtime": self.runtime,
-            "rating": self.rating,
+            "movie_id":    self.movie_id,
+            "title":       self.title,
+            "similarity":  self.similarity,
+            "poster_url":  self.poster_url,
+            "overview":    self.overview,
+            "genres":      self.genres,
+            "cast":        self.cast,
+            "director":    self.director,
+            "release_year":self.release_year,
+            "runtime":     self.runtime,
+            "rating":      self.rating,
         }
 
 

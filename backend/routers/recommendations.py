@@ -81,7 +81,7 @@ def get_preferences(authorization: str = Header(None)):
 
 @router.get("/recommendations")
 def get_recommendations(
-    n: int = 15,
+    n: int = 100,
     authorization: str = Header(None),
 ):
 

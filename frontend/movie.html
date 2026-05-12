@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineMatch — Фильм</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -24,17 +23,16 @@
             --surface2: #1c1c27;
             --border: #2a2a3a;
             --accent: #e8b34b;
-            --accent2: #c97d3f;
             --text: #f0eeea;
             --muted: #6b6b80;
-            --radius: 12px;
+            --radius: 12px
         }
 
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'Manrope', sans-serif;
-            min-height: 100vh;
+            min-height: 100vh
         }
 
         nav {
@@ -47,18 +45,18 @@
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 100
         }
 
         .logo {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1.6rem;
             letter-spacing: .1em;
-            color: var(--accent);
+            color: var(--accent)
         }
 
         .logo span {
-            color: var(--text);
+            color: var(--text)
         }
 
         .btn-back {
@@ -72,43 +70,41 @@
             cursor: pointer;
             transition: all .2s;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            display: inline-block
         }
 
         .btn-back:hover {
             border-color: var(--text);
-            color: var(--text);
+            color: var(--text)
         }
 
-        /* Hero backdrop */
+        /* Hero */
         .hero {
             position: relative;
-            height: 480px;
+            height: 500px;
             overflow: hidden;
             display: flex;
-            align-items: flex-end;
+            align-items: flex-end
         }
 
         .hero-bg {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            background: linear-gradient(135deg, #1a1a2e, #0f3460)
         }
 
         .hero-bg img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: .25;
-            filter: blur(2px);
+            opacity: .2;
+            filter: blur(3px)
         }
 
         .hero-gradient {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, var(--bg) 0%, rgba(10, 10, 15, .6) 40%, transparent 100%);
+            background: linear-gradient(to top, var(--bg) 0%, rgba(10, 10, 15, .5) 40%, transparent 100%)
         }
 
         .hero-content {
@@ -118,7 +114,7 @@
             align-items: flex-end;
             gap: 40px;
             padding: 0 60px 48px;
-            width: 100%;
+            width: 100%
         }
 
         .poster-main {
@@ -129,13 +125,13 @@
             overflow: hidden;
             border: 2px solid rgba(232, 179, 75, .2);
             background: var(--surface2);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .6)
         }
 
         .poster-main img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover
         }
 
         .poster-placeholder {
@@ -145,18 +141,18 @@
             align-items: center;
             justify-content: center;
             font-size: 3rem;
-            color: var(--border);
+            color: var(--border)
         }
 
         .hero-info {
-            flex: 1;
+            flex: 1
         }
 
         .hero-badges {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 12px;
+            margin-bottom: 12px
         }
 
         .badge {
@@ -164,57 +160,51 @@
             border-radius: 6px;
             font-size: .72rem;
             font-weight: 600;
-            letter-spacing: .04em;
+            letter-spacing: .04em
         }
 
-        .badge-year {
+        .b-year {
             background: var(--surface2);
-            color: var(--muted);
+            color: var(--muted)
         }
 
-        .badge-rating {
+        .b-rating {
             background: rgba(232, 179, 75, .15);
             color: var(--accent);
-            border: 1px solid rgba(232, 179, 75, .3);
+            border: 1px solid rgba(232, 179, 75, .3)
         }
 
-        .badge-cert {
+        .b-runtime {
             background: var(--surface2);
-            color: var(--muted);
-            border: 1px solid var(--border);
+            color: var(--muted)
         }
 
-        .badge-runtime {
-            background: var(--surface2);
-            color: var(--muted);
-        }
-
-        .badge-match {
+        .b-match {
             background: rgba(232, 179, 75, .12);
             color: var(--accent);
-            border: 1px solid rgba(232, 179, 75, .25);
+            border: 1px solid rgba(232, 179, 75, .25)
         }
 
         .movie-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
+            font-size: 3.8rem;
             line-height: .95;
             letter-spacing: .04em;
-            margin-bottom: 8px;
+            margin-bottom: 8px
         }
 
         .movie-tagline {
             font-size: .9rem;
             color: var(--muted);
             font-style: italic;
-            margin-bottom: 16px;
+            margin-bottom: 16px
         }
 
         .genre-list {
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 20px
         }
 
         .genre-pill {
@@ -223,13 +213,12 @@
             border-radius: 16px;
             font-size: .78rem;
             color: var(--muted);
-            background: var(--surface);
+            background: var(--surface)
         }
 
         .hero-actions {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 10px
         }
 
         .btn-like {
@@ -242,47 +231,24 @@
             font-size: .85rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all .2s;
-            display: flex;
-            align-items: center;
-            gap: 7px;
+            transition: all .2s
         }
 
         .btn-like:hover,
         .btn-like.liked {
             border-color: rgba(232, 75, 75, .5);
             background: rgba(232, 75, 75, .1);
-            color: #e05252;
+            color: #e05252
         }
 
-        .btn-watchlist {
-            padding: 11px 22px;
-            border: 1px solid var(--accent);
-            border-radius: var(--radius);
-            background: rgba(232, 179, 75, .1);
-            color: var(--accent);
-            font-family: 'Manrope', sans-serif;
-            font-size: .85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .btn-watchlist:hover {
-            background: rgba(232, 179, 75, .2);
-        }
-
-        /* Main content */
+        /* Content */
         .content {
             max-width: 1100px;
             margin: 0 auto;
             padding: 48px 24px 80px;
             display: grid;
             grid-template-columns: 1fr 320px;
-            gap: 48px;
+            gap: 48px
         }
 
         .section-label {
@@ -291,28 +257,25 @@
             letter-spacing: .15em;
             text-transform: uppercase;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 12px
         }
 
-        /* Overview */
         .overview {
             font-size: .95rem;
             line-height: 1.8;
             color: rgba(240, 238, 234, .8);
-            margin-bottom: 36px;
+            margin-bottom: 36px
         }
 
-        /* Cast */
         .cast-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
             gap: 12px;
-            margin-bottom: 36px;
+            margin-bottom: 36px
         }
 
         .cast-card {
-            text-align: center;
-            cursor: pointer;
+            text-align: center
         }
 
         .cast-photo {
@@ -323,17 +286,17 @@
             border: 2px solid var(--border);
             overflow: hidden;
             margin: 0 auto 6px;
-            transition: border-color .2s;
+            transition: border-color .2s
         }
 
         .cast-card:hover .cast-photo {
-            border-color: var(--accent);
+            border-color: var(--accent)
         }
 
         .cast-photo img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover
         }
 
         .cast-photo-placeholder {
@@ -342,27 +305,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: 1.4rem
         }
 
         .cast-name {
             font-size: .72rem;
             font-weight: 600;
             line-height: 1.2;
-            margin-bottom: 2px;
+            margin-bottom: 2px
         }
 
         .cast-role {
             font-size: .64rem;
-            color: var(--muted);
+            color: var(--muted)
         }
 
-        /* Keywords */
         .keywords {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-bottom: 36px;
+            margin-bottom: 36px
         }
 
         .keyword {
@@ -371,90 +333,65 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             font-size: .75rem;
-            color: var(--muted);
+            color: var(--muted)
         }
 
-        /* Sidebar stats */
+        /* Sidebar */
         .sidebar-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 20px;
-            margin-bottom: 16px;
+            margin-bottom: 16px
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             padding: 8px 0;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--border)
         }
 
         .stat-row:last-child {
-            border: none;
+            border: none
         }
 
         .stat-key {
             font-size: .78rem;
             color: var(--muted);
+            flex-shrink: 0
         }
 
         .stat-val {
             font-size: .82rem;
             font-weight: 500;
             text-align: right;
-            max-width: 160px;
+            max-width: 180px
         }
 
-        /* Similar section */
-        .similar-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-
-        .sim-card {
-            flex-shrink: 0;
-            width: 110px;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .sim-poster {
-            width: 110px;
-            aspect-ratio: 2/3;
-            border-radius: 8px;
-            background: var(--surface2);
-            overflow: hidden;
-            border: 1px solid var(--border);
-            margin-bottom: 6px;
-            transition: all .2s;
-        }
-
-        .sim-card:hover .sim-poster {
-            border-color: rgba(232, 179, 75, .4);
-        }
-
-        .sim-poster img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .sim-title {
-            font-size: .72rem;
-            font-weight: 500;
-            line-height: 1.2;
-        }
-
-        .sim-year {
-            font-size: .66rem;
+        /* Loading */
+        .loading-state {
+            text-align: center;
+            padding: 100px 20px;
             color: var(--muted);
+            font-size: .9rem
+        }
+
+        .spinner-large {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto 16px
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
         }
 
         @keyframes fadeIn {
@@ -467,209 +404,216 @@
             }
         }
 
-        .hero {
-            animation: fadeIn .5s ease;
-        }
-
+        .hero,
         .content {
-            animation: fadeIn .5s .1s ease both;
+            animation: fadeIn .5s ease
         }
     </style>
 </head>
 
 <body>
-
     <nav>
         <div class="logo">Cine<span>Match</span></div>
-        <a href="recommendations.html" class="btn-back">← Назад к списку</a>
+        <a href="/recommendations.html" class="btn-back">← Назад к списку</a>
     </nav>
 
-    <!-- HERO -->
-    <div class="hero">
-        <div class="hero-bg">
-            <img id="hero-bg-img" src="" alt="">
-        </div>
+    <!-- Загрузка -->
+    <div id="loading" class="loading-state">
+        <div class="spinner-large"></div>
+        Загружаем данные фильма...
+    </div>
+
+    <!-- Контент (скрыт до загрузки) -->
+    <div id="hero" class="hero" style="display:none">
+        <div class="hero-bg"><img id="hero-bg" src="" alt=""></div>
         <div class="hero-gradient"></div>
         <div class="hero-content">
-            <div class="poster-main">
-                <img id="main-poster" src="" alt="" onerror="this.style.display='none'">
-            </div>
+            <div class="poster-main" id="poster-wrap"></div>
             <div class="hero-info">
-                <div class="hero-badges">
-                    <span class="badge badge-year" id="b-year">2010</span>
-                    <span class="badge badge-rating" id="b-rating">★ 8.8</span>
-                    <span class="badge badge-cert" id="b-cert">PG-13</span>
-                    <span class="badge badge-runtime" id="b-runtime">148 мин</span>
-                    <span class="badge badge-match" id="b-match">96% совпадение</span>
-                </div>
-                <div class="movie-title" id="m-title">Inception</div>
-                <div class="movie-tagline" id="m-tagline">Your mind is the scene of the crime.</div>
+                <div class="hero-badges" id="badges"></div>
+                <div class="movie-title" id="m-title"></div>
+                <div class="movie-tagline" id="m-tagline"></div>
                 <div class="genre-list" id="m-genres"></div>
                 <div class="hero-actions">
                     <button class="btn-like" id="like-btn" onclick="toggleLike()">♡ Нравится</button>
-                    <button class="btn-watchlist">+ В список просмотра</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="content">
+    <div id="main-content" class="content" style="display:none">
         <div>
-            <!-- Overview -->
             <div class="section-label">О фильме</div>
-            <div class="overview" id="m-overview">Загрузка...</div>
+            <div class="overview" id="m-overview"></div>
 
-            <!-- Cast -->
-            <div class="section-label">В ролях</div>
-            <div class="cast-grid" id="cast-grid"></div>
+            <div id="cast-section" style="display:none">
+                <div class="section-label">В ролях</div>
+                <div class="cast-grid" id="cast-grid"></div>
+            </div>
 
-            <!-- Keywords -->
-            <div class="section-label">Ключевые темы</div>
-            <div class="keywords" id="m-keywords"></div>
+            <div id="kw-section" style="display:none">
+                <div class="section-label">Ключевые темы</div>
+                <div class="keywords" id="m-keywords"></div>
+            </div>
         </div>
 
-        <!-- SIDEBAR -->
         <div>
             <div class="sidebar-card">
                 <div class="section-label" style="margin-bottom:16px">Детали</div>
-                <div class="stat-row">
-                    <span class="stat-key">Режиссёр</span>
-                    <span class="stat-val" id="s-director">—</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-key">Год</span>
-                    <span class="stat-val" id="s-year">—</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-key">Страна</span>
-                    <span class="stat-val" id="s-country">—</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-key">Хронометраж</span>
-                    <span class="stat-val" id="s-runtime">—</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-key">Бюджет</span>
-                    <span class="stat-val" id="s-budget">—</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-key">Сборы</span>
-                    <span class="stat-val" id="s-revenue">—</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-key">Рейтинг TMDB</span>
-                    <span class="stat-val" id="s-rating">—</span>
-                </div>
-            </div>
-
-            <div>
-                <div class="section-label">Похожие фильмы</div>
-                <div class="similar-scroll" id="similar-scroll"></div>
+                <div id="stats"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // ЗАГЛУШКА — моковые данные вместо fetch('/api/movie/' + id)
-        const MOCK_MOVIE = {
-            id: 1, title: "Inception", year: 2010, rating: 8.8,
-            tagline: "Your mind is the scene of the crime.",
-            certification: "PG-13", runtime: 148, similarity: 0.96,
-            overview: "Кобб — опытный вор, лучший в своём деле. Его специализация — похищение ценных секретов из глубин подсознания во время сна, когда человеческий разум наиболее уязвим. Но теперь ему предстоит не похитить идею, а внедрить её в сознание жертвы.",
-            genres: ["Science Fiction", "Action", "Adventure"],
-            director: "Christopher Nolan",
-            country: "USA / UK",
-            budget: "$160 000 000",
-            revenue: "$836 836 967",
-            poster_url: "https://image.tmdb.org/t/p/w300/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg",
-            cast: [
-                { name: "Leonardo DiCaprio", character: "Cobb", photo_url: "https://image.tmdb.org/t/p/w45/wo2hJpn04vbtmh0B9utCFdsQhxM.jpg" },
-                { name: "Joseph Gordon-Levitt", character: "Arthur", photo_url: "" },
-                { name: "Elliot Page", character: "Ariadne", photo_url: "" },
-                { name: "Tom Hardy", character: "Eames", photo_url: "" },
-                { name: "Ken Watanabe", character: "Saito", photo_url: "" },
-                { name: "Cillian Murphy", character: "Fischer", photo_url: "" },
-            ],
-            keywords: ["dreams", "heist", "subconscious", "action", "sci-fi", "thriller", "psychology"],
-            similar: [
-                { id: 2, title: "Interstellar", year: 2014, poster_url: "https://image.tmdb.org/t/p/w200/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" },
-                { id: 3, title: "The Dark Knight", year: 2008, poster_url: "https://image.tmdb.org/t/p/w200/qJ2tW6WMUDux911r6m7haRef0WH.jpg" },
-                { id: 7, title: "The Matrix", year: 1999, poster_url: "https://image.tmdb.org/t/p/w200/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg" },
-            ]
-        };
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/index.html';
 
-        // Load data (заглушка)
-        function loadMovie() {
-            const m = MOCK_MOVIE;
-            // В реальности здесь:
-            // const id = new URLSearchParams(location.search).get('id');
-            // const m = await fetch('/api/movie/' + id).then(r=>r.json());
+        const params = new URLSearchParams(window.location.search);
+        const movieId = params.get('id');
+        if (!movieId) window.location.href = '/recommendations.html';
 
-            document.title = 'CineMatch — ' + m.title;
-            document.getElementById('m-title').textContent = m.title;
-            document.getElementById('m-tagline').textContent = m.tagline || '';
-            document.getElementById('m-overview').textContent = m.overview;
+        let isLiked = false;
 
-            document.getElementById('b-year').textContent = m.year;
-            document.getElementById('b-rating').textContent = '★ ' + m.rating;
-            document.getElementById('b-cert').textContent = m.certification || '—';
-            document.getElementById('b-runtime').textContent = m.runtime + ' мин';
-            document.getElementById('b-match').textContent = Math.round(m.similarity * 100) + '% совпадение';
-
-            // Poster
-            if (m.poster_url) {
-                document.getElementById('main-poster').src = m.poster_url;
-                document.getElementById('hero-bg-img').src = m.poster_url;
-            }
-
-            // Genres
-            document.getElementById('m-genres').innerHTML =
-                m.genres.map(g => `<span class="genre-pill">${g}</span>`).join('');
-
-            // Sidebar stats
-            document.getElementById('s-director').textContent = m.director || '—';
-            document.getElementById('s-year').textContent = m.year;
-            document.getElementById('s-country').textContent = m.country || '—';
-            document.getElementById('s-runtime').textContent = m.runtime + ' мин';
-            document.getElementById('s-budget').textContent = m.budget || '—';
-            document.getElementById('s-revenue').textContent = m.revenue || '—';
-            document.getElementById('s-rating').textContent = m.rating + ' / 10';
-
-            // Cast
-            document.getElementById('cast-grid').innerHTML = m.cast.map(c => `
-    <div class="cast-card">
-      <div class="cast-photo">
-        ${c.photo_url
-                    ? `<img src="${c.photo_url}" alt="${c.name}" onerror="this.parentElement.innerHTML='👤'">`
-                    : `<div class="cast-photo-placeholder">👤</div>`}
-      </div>
-      <div class="cast-name">${c.name}</div>
-      <div class="cast-role">${c.character}</div>
-    </div>
-  `).join('');
-
-            // Keywords
-            document.getElementById('m-keywords').innerHTML =
-                m.keywords.map(k => `<span class="keyword">${k}</span>`).join('');
-
-            // Similar
-            document.getElementById('similar-scroll').innerHTML = m.similar.map(s => `
-    <a class="sim-card" href="movie.html?id=${s.id}">
-      <div class="sim-poster">
-        ${s.poster_url ? `<img src="${s.poster_url}" alt="${s.title}">` : ''}
-      </div>
-      <div class="sim-title">${s.title}</div>
-      <div class="sim-year">${s.year}</div>
-    </a>
-  `).join('');
+        function fmt(n) {
+            if (!n) return null;
+            return '$' + Number(n).toLocaleString('en-US');
         }
 
-        function toggleLike() {
-            const btn = document.getElementById('like-btn');
-            const isLiked = btn.classList.toggle('liked');
-            btn.textContent = isLiked ? '♥ Нравится' : '♡ Нравится';
-            // ЗАГЛУШКА — здесь будет fetch('/api/like', {method:'POST', ...})
+        function parseList(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            try { return JSON.parse(val.replace(/'/g, '"')); } catch (e) { }
+            return String(val).split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        async function loadMovie() {
+            try {
+                // Загружаем данные фильма
+                const res = await fetch(`/api/movie/${movieId}`);
+                if (!res.ok) { window.location.href = '/recommendations.html'; return; }
+                const m = await res.json();
+
+                // Проверяем лайк
+                const likesRes = await fetch('/api/likes', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (likesRes.ok) {
+                    const likesData = await likesRes.json();
+                    isLiked = (likesData.movie_ids || []).includes(m.movie_id);
+                }
+
+                // Заполняем страницу
+                document.title = 'CineMatch — ' + (m.title || 'Фильм');
+
+                // Hero фон
+                if (m.poster_url) document.getElementById('hero-bg').src = m.poster_url;
+
+                // Постер
+                document.getElementById('poster-wrap').innerHTML = m.poster_url
+                    ? `<img src="${m.poster_url}" alt="${m.title}"
+              onerror="this.parentElement.innerHTML='<div class=poster-placeholder>🎬</div>'">`
+                    : `<div class="poster-placeholder">🎬</div>`;
+
+                // Бейджи
+                const year = m.release_date ? m.release_date.slice(0, 4) : null;
+                const rating = m.tmdb_rating ? m.tmdb_rating.toFixed(1) : null;
+                let badgesHtml = '';
+                if (year) badgesHtml += `<span class="badge b-year">${year}</span>`;
+                if (rating) badgesHtml += `<span class="badge b-rating">★ ${rating}</span>`;
+                if (m.runtime) badgesHtml += `<span class="badge b-runtime">${m.runtime} мин</span>`;
+                document.getElementById('badges').innerHTML = badgesHtml;
+
+                // Название и тэглайн
+                document.getElementById('m-title').textContent = m.title || '';
+                document.getElementById('m-tagline').textContent = m.tagline || '';
+
+                // Жанры
+                const genres = parseList(m.genres);
+                document.getElementById('m-genres').innerHTML =
+                    genres.map(g => `<span class="genre-pill">${g}</span>`).join('');
+
+                // Описание
+                document.getElementById('m-overview').textContent =
+                    m.overview || 'Описание недоступно.';
+
+                // Кнопка лайка
+                const likeBtn = document.getElementById('like-btn');
+                likeBtn.textContent = isLiked ? '♥ Нравится' : '♡ Нравится';
+                if (isLiked) likeBtn.classList.add('liked');
+
+                // Актёры
+                const cast = Array.isArray(m.cast) ? m.cast : parseList(m.cast);
+                if (cast.length) {
+                    document.getElementById('cast-section').style.display = 'block';
+                    document.getElementById('cast-grid').innerHTML = cast.map(c => {
+                        const name = typeof c === 'object' ? (c.name || '') : c;
+                        const role = typeof c === 'object' ? (c.character || '') : '';
+                        const photoUrl = typeof c === 'object' ? (c.profile_url || '') : '';
+                        return `
+          <div class="cast-card">
+            <div class="cast-photo">
+              ${photoUrl
+                                ? `<img src="${photoUrl}" alt="${name}"
+                        onerror="this.parentElement.innerHTML='<div class=cast-photo-placeholder>👤</div>'">`
+                                : `<div class="cast-photo-placeholder">👤</div>`}
+            </div>
+            <div class="cast-name">${name}</div>
+            ${role ? `<div class="cast-role">${role}</div>` : ''}
+          </div>`;
+                    }).join('');
+                }
+
+                // Ключевые слова
+                const kws = parseList(m.keywords);
+                if (kws.length) {
+                    document.getElementById('kw-section').style.display = 'block';
+                    document.getElementById('m-keywords').innerHTML =
+                        kws.slice(0, 15).map(k => `<span class="keyword">${k}</span>`).join('');
+                }
+
+                // Боковая панель с деталями
+                const stats = [];
+                if (m.director) stats.push(['Режиссёр', m.director]);
+                if (year) stats.push(['Год', year]);
+                if (m.runtime) stats.push(['Хронометраж', m.runtime + ' мин']);
+                if (rating) stats.push(['Рейтинг TMDB', rating + ' / 10']);
+                if (m.tmdb_votes) stats.push(['Голосов', Number(m.tmdb_votes).toLocaleString()]);
+                if (m.budget) stats.push(['Бюджет', fmt(m.budget)]);
+                if (m.revenue) stats.push(['Сборы', fmt(m.revenue)]);
+                document.getElementById('stats').innerHTML = stats.map(([k, v]) =>
+                    `<div class="stat-row">
+        <span class="stat-key">${k}</span>
+        <span class="stat-val">${v || '—'}</span>
+      </div>`
+                ).join('');
+
+                // Показываем страницу
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('hero').style.display = '';
+                document.getElementById('main-content').style.display = '';
+
+            } catch (e) {
+                document.getElementById('loading').innerHTML = `
+      <div>Ошибка загрузки</div>
+      <a href="/recommendations.html" style="color:var(--accent)">← Вернуться</a>`;
+            }
+        }
+
+        async function toggleLike() {
+            const method = isLiked ? 'DELETE' : 'POST';
+            try {
+                const res = await fetch(`/api/like/${movieId}`, {
+                    method,
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    isLiked = !isLiked;
+                    const btn = document.getElementById('like-btn');
+                    btn.textContent = isLiked ? '♥ Нравится' : '♡ Нравится';
+                    btn.classList.toggle('liked', isLiked);
+                }
+            } catch (e) { }
         }
 
         loadMovie();

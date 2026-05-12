@@ -15,32 +15,16 @@ class DatabaseManager:
 
 
     def connect(self) -> None:
-        """
-        Открыть соединение с базой данных.
-
-        SQLite хранит всю базу в одном файле — app.db
-        Если файла нет — SQLite создаст его автоматически.
-        """
-
-        # Создаём папку "database/" если её нет
-        # exist_ok=True — не падать с ошибкой если папка уже есть
+       
         os.makedirs(os.path.dirname(self._db_path), exist_ok=True)
 
-        # Открываем (или создаём) файл базы данных
-        # После этой строки файл app.db появится на диске
-        self._connection = sqlite3.connect(self._db_path)
+        self._connection = sqlite3.connect(
+            self._db_path,
+            check_same_thread=False
+            )
 
-        # row_factory = sqlite3.Row — это очень важная настройка.
-        # Без неё результаты запросов возвращаются как кортежи:
-        #   row[0], row[1], row[2]  — неудобно и непонятно
-        # С ней результаты как словари:
-        #   row['id'], row['username']  — сразу понятно что есть что
         self._connection.row_factory = sqlite3.Row
 
-        # Включаем поддержку FOREIGN KEY — по умолчанию в SQLite она ВЫКЛЮЧЕНА.
-        # FOREIGN KEY — это связь между таблицами.
-        # Например: preferences.user_id должен существовать в users.id
-        # Без этой строки SQLite просто игнорирует эти связи.
         self._connection.execute("PRAGMA foreign_keys = ON")
 
         print(f"[DB] Подключено: {self._db_path}")

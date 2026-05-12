@@ -34,6 +34,7 @@ class UserPreferences:
         min_rating=None,
         max_runtime=240,
         certification="",
+        keywords=None,
     ):
         self.user_id = user_id
         self.genres = genres if genres is not None else []
@@ -44,6 +45,7 @@ class UserPreferences:
         self.min_rating = min_rating
         self.max_runtime = max_runtime
         self.certification = certification
+        self.keywords = keywords if keywords is not None else []  
 
     def to_dict(self):
         return {
@@ -56,5 +58,24 @@ class UserPreferences:
             "min_rating": self.min_rating,
             "max_runtime": self.max_runtime,
             "certification": self.certification,
+            "keywords": self.keywords,
         }
+        
+    def to_criteria_dict(self) -> dict:
+        criteria = {
+            "year_from":   self.year_from,
+            "year_to":     self.year_to,
+            "max_runtime": self.max_runtime,
+        }
+        if self.genres:
+            criteria["genres"] = self.genres
+        if self.cast:
+            criteria["cast"] = self.cast
+        if self.director:
+            criteria["director"] = self.director
+        if self.min_rating is not None:
+            criteria["min_rating"] = self.min_rating
+        if hasattr(self, 'keywords') and self.keywords:
+            criteria["keywords"] = self.keywords
+        return criteria
         

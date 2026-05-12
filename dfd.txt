@@ -1,0 +1,50 @@
+Вижу две отдельные проблемы. Разберём по очереди.
+
+Проблема 1 — одинаковые фильмы
+Embedding и TF-IDF работают, но числовой вектор доминирует. Все запросы имеют одинаковые числа (медианы) — поэтому KNN находит одних и тех же соседей.
+Проверь в ноутбуке:
+python# Тест с нулевым числовым вектором
+num_zero = csr_matrix(np.zeros((1, 7)))
+
+tfidf_action  = tfidf.transform(["action"])
+tfidf_romance = tfidf.transform(["romance"])
+
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('../data/model/transformers/embedding_model')
+emb_action  = csr_matrix(model.encode(["Genres: Action"], normalize_embeddings=True))
+emb_romance = csr_matrix(model.encode(["Genres: Romance"], normalize_embeddings=True))
+
+q1 = normalize(hstack([num_zero, tfidf_action,  emb_action]),  norm='l2')
+q2 = normalize(hstack([num_zero, tfidf_romance, emb_romance]), norm='l2')
+
+d1, i1 = knn.kneighbors(q1, n_neighbors=5)
+d2, i2 = knn.kneighbors(q2, n_neighbors=5)
+print("Action:", i1[0])
+print("Romance:", i2[0])
+print("Одинаковые?", list(i1[0]) == list(i2[0]))
+Скажи результат. Если теперь разные — нужно убрать числовые дефолты из запроса когда юзер их не указал. Если всё равно одинаковые — проблема в весах при обучении матрицы.
+
+Проблема 2 — 1% совпадение
+Это точно проблема с формулой. В recommender.py метод _build_results исправь так:
+python
+def _build_results(self, indices, distances, n):
+    results = []
+    for idx, dist in zip(indices, distances):
+        # cosine distance: 0 = идентичные, 2 = противоположные
+        # Переводим в проценты 0-100
+        similarity = float(max(0.0, 1.0 - dist))
+        results.append({
+            "matrix_index": int(idx),
+            "similarity":   round(similarity, 4),
+        })
+        if len(results) >= n:
+            break
+    return results
+И в recommend_service.py в методе get_for_user — similarity уже от 0 до 1, в to_dict() не умножай на 100. А в recommendations.html найди строку:
+javascript// было
+const sim = Math.round(m.similarity);
+
+// стало  
+const sim = Math.round(m.similarity * 100);
+Distances у тебя 0.12-0.14 — это означает что реальное совпадение 86-88%, а не 1%. Просто формула была неправильная.
+Запусти тест с нулевым числовым вектором и скажи результат.

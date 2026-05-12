@@ -9,7 +9,7 @@ class SessionRepository:
         self.db_manager = db_manager
 
     def create_session(self, user_id: int) -> Session:
-        """Создаёт новую сессию: токен генерируем мы, БД только хранит строку."""
+    
         token = secrets.token_urlsafe(32)
         self.db_manager.execute(
             "INSERT INTO sessions (token, user_id) VALUES (?, ?)",

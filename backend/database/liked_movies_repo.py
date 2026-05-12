@@ -8,10 +8,7 @@ class LikedMoviesRepository:
         self.db_manager = db_manager
 
     def add_like(self, user_id: int, movie_id: int) -> bool:
-        """
-        Добавить лайк. Возвращает True, если строка вставлена,
-        False если пара (user_id, movie_id) уже была (UNIQUE).
-        """
+       
         cur = self.db_manager.execute(
             "INSERT OR IGNORE INTO liked_movies (user_id, movie_id) VALUES (?, ?)",
             (user_id, movie_id),
@@ -20,7 +17,7 @@ class LikedMoviesRepository:
         return cur.rowcount > 0
 
     def remove_like(self, user_id: int, movie_id: int) -> bool:
-        """Удалить лайк. True, если что-то удалили."""
+        
         cur = self.db_manager.execute(
             "DELETE FROM liked_movies WHERE user_id = ? AND movie_id = ?",
             (user_id, movie_id),

@@ -15,14 +15,14 @@ class RecommendationService:
         print(f"[RecommendService] Индекс: {len(self._movie_ids)} фильмов")
 
     def get_for_user(self, user_id: int, n: int = 15) -> list[Movie]:
-       
         prefs = self._prefs_repo.get_by_user_id(user_id)
         if prefs is None:
             return []
 
         criteria = prefs.to_criteria_dict()
 
-        raw = self._engine.recommend(criteria, n=n * 3)
+      
+        raw = self._engine.recommend(criteria, n=n * 5)
 
         movies = []
         for item in raw:
@@ -32,13 +32,22 @@ class RecommendationService:
             if matrix_idx >= len(self._movie_ids):
                 continue
             movie_id = int(self._movie_ids[matrix_idx])
-
-            data = self._metadata.get_by_id(movie_id)
+            data     = self._metadata.get_by_id(movie_id)
             if data is None:
                 continue
 
-            
             if not self._passes_filters(data, criteria):
+                continue
+
+            if not data.get("poster_url"):
+                continue
+            if not data.get("tmdb_rating"):
+                continue
+
+            if float(data.get("tmdb_rating", 0)) < 4.0:
+                continue
+
+            if float(data.get("tmdb_votes", 0)) < 50:
                 continue
 
             movies.append(Movie(
@@ -54,11 +63,12 @@ class RecommendationService:
                 runtime     = data.get("runtime"),
                 rating      = data.get("tmdb_rating"),
             ))
+        movies.sort(
+            key=lambda m: (m.similarity * 0.6) + (float(m.rating or 0) / 10 * 0.4),
+            reverse=True
+        )
 
-            if len(movies) >= n:
-                break
-
-        return movies
+        return movies[:n]
 
     def get_movie_detail(self, movie_id: int) -> dict | None:
         return self._metadata.get_by_id(movie_id)

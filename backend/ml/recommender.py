@@ -8,14 +8,7 @@ from backend.ml.loader import ModelLoader
 
 
 class RecommenderEngine:
-    """
-    Обёртка над KNN моделью.
 
-    Принимает criteria dict от пользователя →
-    строит вектор запроса (tfidf + embedding + числа) →
-    ищет ближайших соседей в feature_matrix →
-    возвращает список фильмов с similarity.
-    """
 
     
     NUM_FEATURES_COUNT = 7
@@ -123,7 +116,6 @@ class RecommenderEngine:
 
         text = " ".join(parts) if parts else "popular movie"
 
-        # Это должен быть РЕАЛЬНЫЙ вектор, не нули
         vector = self._loader.embedder.encode(
             [text], normalize_embeddings=True
         )
@@ -173,13 +165,13 @@ class RecommenderEngine:
         rating  = criteria["min_rating"] if criteria.get("min_rating") is not None else 0.0
 
         vec = pd.DataFrame([[
-            runtime,          # runtime
-            0.0,              # popularity — не знаем, ставим 0
-            0.0,              # budget — не знаем, ставим 0
-            0.0,              # revenue — не знаем, ставим 0
-            rating,           # tmdb_rating
-            0.0,              # tmdb_votes — не знаем, ставим 0
-            year,             # year
+            runtime,         
+            0.0,             
+            0.0,             
+            0.0,             
+            rating,          
+            0.0,             
+            year,            
         ]], columns=['runtime','popularity','budget','revenue',
                     'tmdb_rating','tmdb_votes','year'])
 
@@ -189,8 +181,7 @@ class RecommenderEngine:
     def _build_results(self, indices, distances, n):
         results = []
         for idx, dist in zip(indices, distances):
-            # cosine distance: 0 = идентичные, 2 = противоположные
-            # Переводим в проценты 0-100
+           
             similarity = float(max(0.0, 1.0 - dist))
             results.append({
                 "matrix_index": int(idx),

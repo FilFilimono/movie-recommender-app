@@ -17,4 +17,4 @@ class PreferencesRequest(BaseModel):
     min_rating: float|None = None
     max_runtime: int= 240
     keywords: list[str]  = []
-    # без сертификакции ей не интересуемся 
+    

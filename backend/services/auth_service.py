@@ -21,9 +21,9 @@ class AuthorizationService:
         
         if not self._hasher.is_strong(password):
             raise AuthError("не надежный пароль [REGISTER]")
-        
+            
         hash_password = self._hasher.hash(password)
-        
+            
         user = User(username, hash_password)
         
         user = self._user_repo.create_user(user)

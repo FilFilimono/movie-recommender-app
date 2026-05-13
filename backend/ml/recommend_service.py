@@ -20,11 +20,16 @@ class RecommendationService:
             return []
 
         criteria = prefs.to_criteria_dict()
+        print(f"[DEBUG] criteria: {criteria}")
+        print(f"[DEBUG] n запрошено: {n}")
 
-      
-        raw = self._engine.recommend(criteria, n=n * 5)
+        raw = self._engine.recommend(criteria, n=n * 10)
+        print(f"[DEBUG] KNN вернул: {len(raw)} кандидатов")
 
         movies = []
+        skipped_filter = 0
+        skipped_none = 0
+
         for item in raw:
             matrix_idx = item["matrix_index"]
             similarity  = item["similarity"]
@@ -32,22 +37,13 @@ class RecommendationService:
             if matrix_idx >= len(self._movie_ids):
                 continue
             movie_id = int(self._movie_ids[matrix_idx])
-            data     = self._metadata.get_by_id(movie_id)
+            data = self._metadata.get_by_id(movie_id)
             if data is None:
+                skipped_none += 1
                 continue
 
             if not self._passes_filters(data, criteria):
-                continue
-
-            if not data.get("poster_url"):
-                continue
-            if not data.get("tmdb_rating"):
-                continue
-
-            if float(data.get("tmdb_rating", 0)) < 4.0:
-                continue
-
-            if float(data.get("tmdb_votes", 0)) < 50:
+                skipped_filter += 1
                 continue
 
             movies.append(Movie(
@@ -63,10 +59,30 @@ class RecommendationService:
                 runtime     = data.get("runtime"),
                 rating      = data.get("tmdb_rating"),
             ))
-        movies.sort(
-            key=lambda m: (m.similarity * 0.6) + (float(m.rating or 0) / 10 * 0.4),
-            reverse=True
-        )
+        def sort_key(m):
+           
+            data = self._metadata.get_by_id(m.movie_id)
+            revenue    = float(data.get("revenue")    or 0)
+            votes      = float(data.get("tmdb_votes") or 0)
+            rating     = float(m.rating               or 0)
+
+            revenue_score = min(revenue / 2_923_706_026, 1.0)
+            
+            votes_score = min(votes / 39367, 1.0)
+
+            score = (
+                m.similarity          * 0.50 +
+                revenue_score         * 0.25 +
+                (rating / 10)         * 0.10 +
+                votes_score           * 0.15
+            )
+            return score    
+
+        movies.sort(key=sort_key, reverse=True)
+        
+        print(f"[DEBUG] Срезано фильтром: {skipped_filter}")
+        print(f"[DEBUG] Не найдено в metadata: {skipped_none}")
+        print(f"[DEBUG] Итого фильмов: {len(movies)}")
 
         return movies[:n]
 
@@ -75,22 +91,40 @@ class RecommendationService:
 
 
     def _passes_filters(self, data: dict, criteria: dict) -> bool:
-       
+
+        # Минимум голосов — убирает неизвестные фильмы
+        votes = float(data.get("tmdb_votes") or 0)
+        if votes < 200:        # ← минимум 200 голосов
+            return False
+
+        # Минимальный рейтинг по умолчанию
+        rating = float(data.get("tmdb_rating") or 0)
+        if rating < 5.0:       # ← совсем плохие не показываем
+            return False
+
+        # Постер обязателен
+        if not data.get("poster_url"):
+            return False
+
+        # Год
         year = self._parse_year(data.get("release_date"))
-        if year is not None:
-            if criteria.get("year_from") and year < criteria["year_from"]:
-                return False
-            if criteria.get("year_to") and year > criteria["year_to"]:
+        if year:
+            if criteria.get("year_from", 1970) > 1970:
+                if year < criteria["year_from"]:
+                    return False
+            if criteria.get("year_to", 2024) < 2024:
+                if year > criteria["year_to"]:
+                    return False
+
+        # Рейтинг если задан юзером
+        if criteria.get("min_rating"):
+            if rating < float(criteria["min_rating"]):
                 return False
 
-        rating = data.get("tmdb_rating")
-        if rating is not None and criteria.get("min_rating"):
-            if rating < criteria["min_rating"]:
-                return False
-
+        # Хронометраж если задан
         runtime = data.get("runtime")
-        if runtime is not None and criteria.get("max_runtime"):
-            if runtime > criteria["max_runtime"]:
+        if runtime and criteria.get("max_runtime", 240) < 240:
+            if int(runtime) > criteria["max_runtime"]:
                 return False
 
         return True

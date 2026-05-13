@@ -17,10 +17,10 @@ _liked_repo: Optional[LikedMoviesRepository] = None
 
 
 def init(
-    auth:      AuthorizationService,
+    auth: AuthorizationService,
     recommend: RecommendationService,
-    prefs:     PreferencesRepository,
-    liked:     LikedMoviesRepository,
+    prefs: PreferencesRepository,
+    liked: LikedMoviesRepository,
 ) -> None:
     global _auth_service, _recommend_service, _prefs_repo, _liked_repo
     _auth_service = auth
@@ -54,15 +54,15 @@ def save_preferences(
 
     user_id = _get_user_id(authorization)
     prefs = UserPreferences(
-        user_id     = user_id,
-        genres      = body.genres,
-        cast        = body.cast,
-        director    = body.director,
-        year_from   = body.year_from,
-        year_to     = body.year_to,
-        min_rating  = body.min_rating,
+        user_id = user_id,
+        genres = body.genres,
+        cast = body.cast,
+        director = body.director,
+        year_from = body.year_from,
+        year_to = body.year_to,
+        min_rating = body.min_rating,
         max_runtime = body.max_runtime,
-        keywords    = body.keywords,
+        keywords = body.keywords,
     )
     _prefs_repo.save_by_user_id(prefs, user_id)
     return {"ok": True}

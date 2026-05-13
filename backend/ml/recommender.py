@@ -8,47 +8,34 @@ from backend.ml.loader import ModelLoader
 
 
 class RecommenderEngine:
-
-
     
     NUM_FEATURES_COUNT = 7
-
-    
-    _NUM_DEFAULTS = { #FIXME Пересмотреть медианные значения 
-        "runtime":    95.0,
-        "popularity": 15.0,
-        "budget":     20_000_000.0,
-        "revenue":    50_000_000.0,
-        "tmdb_rating": 7.0,
-        "tmdb_votes": 1000.0,
-        "year":       2005.0,
-    }
 
     def __init__(self, loader: ModelLoader):
         self._loader = loader
 
-    def recommend(self, criteria: dict, n: int = 15,) -> list[dict]:
+    def recommend(self, criteria: dict, n: int = 50,) -> list[dict]: #FIXME n =15
         
-        
-        tfidf_vector = self._build_tfidf_vector(criteria)
-        
-        emb_vector = self._build_embedding_vector(criteria)
-        
-        num_vector = self._build_num_vector(criteria)
+        tfidf_vec = self._build_tfidf_vector(criteria)
+        emb_vec   = self._build_embedding_vector(criteria)
+        num_vec   = self._build_num_vector(criteria)
 
        
-        query = hstack([num_vector, tfidf_vector, emb_vector])
+        query = hstack([
+        num_vec   * 0.8,
+        tfidf_vec * 3.0,
+        emb_vec   * 2.0,
+    ])
         query = normalize(query, norm="l2")
 
        
-        n_search = min(n * 2, self._loader.feature_matrix.shape[0])
+        n_search = min(n * 5, self._loader.feature_matrix.shape[0])
         distances, indices = self._loader.knn.kneighbors(query, n_neighbors=n_search)
 
 
         results = self._build_results(indices[0], distances[0], n)
         return results
 
-    
 
     def _build_tfidf_vector(self, criteria: dict):
         parts = []
@@ -79,28 +66,6 @@ class RecommenderEngine:
         text = " ".join(parts) if parts else "movie"
         return self._loader.tfidf.transform([text])
 
-    # def _build_embedding_vector(self, criteria: dict):
-        
-    #     parts = []
-
-    #     if criteria.get("genres"):
-    #         parts.append(f"Genres: {', '.join(criteria['genres'])}")
-
-    #     if criteria.get("keywords"):
-    #         parts.append(f"Themes: {', '.join(criteria['keywords'])}")
-
-    #     if criteria.get("cast"):
-    #         parts.append(f"Cast: {', '.join(criteria['cast'])}")
-
-    #     if criteria.get("director"):
-    #         parts.append(f"Director: {criteria['director']}")
-
-    #     text = " ".join(parts) if parts else "popular movie"
-
-    #     vector = self._loader.embedder.encode(
-    #         [text], normalize_embeddings=True
-    #     )
-    #     return csr_matrix(vector)
     
     def _build_embedding_vector(self, criteria: dict):
         parts = []
@@ -125,55 +90,27 @@ class RecommenderEngine:
 
         return csr_matrix(vector)
 
-    # def _build_num_vector(self, criteria: dict):
-        
-    #     d = self._NUM_DEFAULTS
 
-    #     year_from = criteria.get("year_from", 1970)
-    #     year_to   = criteria.get("year_to",   2024)
-    #     year      = (year_from + year_to) / 2
-
-
-    #     if criteria.get("max_runtime"):
-    #         runtime = criteria["max_runtime"] * 0.75
-    #     else:
-    #         runtime = d["runtime"]
-
-       
-    #     min_rating = criteria.get("min_rating")
-    #     rating = min_rating if min_rating is not None else d["tmdb_rating"]
-
-    #     vec = pd.DataFrame([[runtime, d["popularity"], d["budget"], d["revenue"],
-    #                  rating, d["tmdb_votes"], year]],
-    #                columns=['runtime','popularity','budget','revenue',
-    #                         'tmdb_rating','tmdb_votes','year'])
-
-       
-    #     num_normalized = self._loader.scaler.transform(vec)
-    #     return csr_matrix(num_normalized)
 
     def _build_num_vector(self, criteria: dict):
-       
-        d = self._NUM_DEFAULTS
 
         year_from = criteria.get("year_from", 1970)
         year_to   = criteria.get("year_to",   2024)
         year      = (year_from + year_to) / 2
 
-        
-        runtime = criteria["max_runtime"] * 0.75 if criteria.get("max_runtime") else 0.0
-        rating  = criteria["min_rating"] if criteria.get("min_rating") is not None else 0.0
+        runtime = criteria.get("max_runtime") or 93.0
+        rating = criteria.get("min_rating")  or 6.0
 
         vec = pd.DataFrame([[
-            runtime,         
-            0.0,             
-            0.0,             
-            0.0,             
-            rating,          
-            0.0,             
-            year,            
-        ]], columns=['runtime','popularity','budget','revenue',
-                    'tmdb_rating','tmdb_votes','year'])
+            np.log1p(runtime),     
+            np.log1p(1.5),         
+            np.log1p(4500000.0),         
+            np.log1p(100000.0),         
+            rating,                 
+            np.log1p(500.0),         
+            year,                 
+        ]], columns=['runtime', 'popularity', 'budget',
+                    'revenue', 'tmdb_rating', 'tmdb_votes', 'year'])
 
         num_normalized = self._loader.scaler.transform(vec)
         return csr_matrix(num_normalized)

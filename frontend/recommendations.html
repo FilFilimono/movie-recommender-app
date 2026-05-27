@@ -455,6 +455,7 @@
             <span class="nav-user" id="nav-user"></span>
             <a href="/search.html" class="btn-outline">🔍 Поиск</a>
             <a href="/onboarding.html" class="btn-outline">⚙ Изменить вкус</a>
+            <button class="btn-outline" onclick="refreshRecs()">↻ Обновить</button>
             <button class="btn-logout" onclick="logout()">Выйти</button>
         </div>
     </nav>
@@ -498,6 +499,11 @@
             }
         }
 
+        function refreshRecs() {
+                sessionStorage.removeItem('recommendations');
+                loadRecommendations();
+            }
+
         // Метка совпадения вместо процентов
         function getMatchLabel(similarity) {
             if (similarity >= 0.15) return { label: '✦ Отличное совпадение', cls: 'match-great' };
@@ -519,54 +525,66 @@
         }
 
         async function loadRecommendations() {
-            showSkeletons();
-            try {
-                const res = await fetch('/api/recommendations?n=100', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (res.status === 401) { localStorage.clear(); window.location.href = '/index.html'; return; }
-                if (res.status === 400) { window.location.href = '/onboarding.html'; return; }
-
-                allMovies = await res.json();
-
-                // Лайки
-                const likesRes = await fetch('/api/likes', { headers: { 'Authorization': 'Bearer ' + token } });
-                if (likesRes.ok) liked = new Set((await likesRes.json()).movie_ids);
-
-                // Subtitle
-                const prefsRes = await fetch('/api/preferences', { headers: { 'Authorization': 'Bearer ' + token } });
-                if (prefsRes.ok) {
-                    const prefs = await prefsRes.json();
-                    if (prefs) {
-                        const parts = [];
-                        if (prefs.genres?.length) parts.push(prefs.genres.join(', '));
-                        if (prefs.year_from) parts.push(prefs.year_from + '–' + prefs.year_to);
-                        if (prefs.min_rating) parts.push('рейтинг ' + prefs.min_rating + '+');
-                        if (prefs.certification) {
-                            const certMap = {
-                                'G': '0+', 'PG': 'PG', 'PG-13': '13+',
-                                'R': '17+', 'NC-17': '18+'
-                            };
-                            const labels = prefs.certification.split(',')
-                                .map(c => certMap[c.trim()] || c.trim())
-                                .join(', ');
-                            parts.push('возраст ' + labels);
-                        }
-                        document.getElementById('page-subtitle').textContent =
-                            parts.length ? 'По критериям: ' + parts.join(' · ') : 'Топ фильмы по вашим вкусам';
-                    }
+                const cached = sessionStorage.getItem('recommendations');
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    allMovies = data.movies;
+                    liked = new Set(data.liked);
+                    document.getElementById('page-subtitle').textContent = data.subtitle || '';
+                    renderMovies(allMovies);
+                    return;
                 }
-                renderMovies(allMovies);
-            } catch (e) {
-                document.getElementById('movies-grid').innerHTML = `
+
+                showSkeletons();
+                try {
+                    const res = await fetch('/api/recommendations?n=100', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res.status === 401) { localStorage.clear(); window.location.href = '/index.html'; return; }
+                    if (res.status === 400) { window.location.href = '/onboarding.html'; return; }
+
+                    allMovies = await res.json();
+
+                    const likesRes = await fetch('/api/likes', { headers: { 'Authorization': 'Bearer ' + token } });
+                    if (likesRes.ok) liked = new Set((await likesRes.json()).movie_ids);
+
+                    const prefsRes = await fetch('/api/preferences', { headers: { 'Authorization': 'Bearer ' + token } });
+                    let subtitle = 'Топ фильмы по вашим вкусам';
+                    if (prefsRes.ok) {
+                        const prefs = await prefsRes.json();
+                        if (prefs) {
+                            const parts = [];
+                            if (prefs.genres?.length) parts.push(prefs.genres.join(', '));
+                            if (prefs.year_from) parts.push(prefs.year_from + '–' + prefs.year_to);
+                            if (prefs.min_rating) parts.push('рейтинг ' + prefs.min_rating + '+');
+                            if (prefs.certification) {
+                                const certMap = { 'G': '0+', 'PG': 'PG', 'PG-13': '13+', 'R': '17+', 'NC-17': '18+' };
+                                const labels = prefs.certification.split(',')
+                                    .map(c => certMap[c.trim()] || c.trim()).join(', ');
+                                parts.push('возраст ' + labels);
+                            }
+                            if (parts.length) subtitle = 'По критериям: ' + parts.join(' · ');
+                        }
+                    }
+                    document.getElementById('page-subtitle').textContent = subtitle;
+
+                    // Сохраняем в sessionStorage — живёт только пока открыта вкладка
+                    sessionStorage.setItem('recommendations', JSON.stringify({
+                        movies: allMovies,
+                        liked: Array.from(liked),
+                        subtitle: subtitle,
+                    }));
+
+                    renderMovies(allMovies);
+                } catch (e) {
+                    document.getElementById('movies-grid').innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">⚠️</div>
         <div class="empty-title">Ошибка загрузки</div>
-        <div class="empty-desc">Не удалось загрузить рекомендации</div>
-        <button class="btn-primary" onclick="loadRecommendations()">Попробовать снова</button>
+        <button class="btn-primary" onclick="loadRecommendations()">Повторить</button>
       </div>`;
+                }
             }
-        }
 
         // Перевод certification в читаемый вид
         function certLabel(cert) {

@@ -53,6 +53,7 @@ def save_preferences(
 ):
 
     user_id = _get_user_id(authorization)
+    print(f"[PREFS] Получено: {body.dict()}")
     prefs = UserPreferences(
         user_id = user_id,
         genres = body.genres,
@@ -63,6 +64,7 @@ def save_preferences(
         min_rating = body.min_rating,
         max_runtime = body.max_runtime,
         keywords = body.keywords,
+        certification = body.certification,
     )
     _prefs_repo.save_by_user_id(prefs, user_id)
     return {"ok": True}

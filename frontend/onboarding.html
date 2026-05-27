@@ -783,6 +783,7 @@
         }
 
         async function submitPreferences() {
+            console.log('Отправляем:', JSON.stringify(prefs));
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
             btn.innerHTML = '<div class="spinner"></div> Сохраняем...';

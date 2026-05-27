@@ -60,6 +60,7 @@ class PreferencesRepository:
             "min_rating": prefs.min_rating,
             "max_runtime": prefs.max_runtime,
             "certification": prefs.certification,
+            "keywords":      prefs.keywords,  
         }
 
     @staticmethod
@@ -74,4 +75,5 @@ class PreferencesRepository:
             min_rating=d.get("min_rating"),
             max_runtime=d.get("max_runtime", 240),
             certification=d.get("certification", ""),
+            keywords = d.get("keywords") or [],
         )

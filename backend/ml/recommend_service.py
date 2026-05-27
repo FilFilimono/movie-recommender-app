@@ -20,7 +20,7 @@ class RecommendationService:
             return []
 
         criteria = prefs.to_criteria_dict()
-
+        print(f"[SERVICE] criteria: {criteria}")  
         raw = self._engine.recommend(criteria, n=1500)
 
         movies = []
@@ -121,7 +121,7 @@ class RecommendationService:
             if allowed:
                 movie_cert = (data.get("certification") or "").strip()
                 print(f"[CERT] movie={movie_cert!r} allowed={allowed} pass={movie_cert in allowed}")
-                if movie_cert not in allowed:
+                if not movie_cert or movie_cert not in allowed:
                     return False
 
         return True

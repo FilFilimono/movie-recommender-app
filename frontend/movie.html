@@ -185,6 +185,12 @@
             border: 1px solid rgba(232, 179, 75, .25)
         }
 
+        .b-cert {
+            background:rgba(107,107,128,.15);
+            color:#9b9bb0;
+            border:1px solid rgba(107,107,128,.3)
+        }
+
         .movie-title {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 3.8rem;
@@ -522,6 +528,22 @@
                 if (year) badgesHtml += `<span class="badge b-year">${year}</span>`;
                 if (rating) badgesHtml += `<span class="badge b-rating">★ ${rating}</span>`;
                 if (m.runtime) badgesHtml += `<span class="badge b-runtime">${m.runtime} мин</span>`;
+                if (m.certification) {
+                    const certMap = {
+                        'G': '0+',
+                        'PG': 'PG · 6+',
+                        'PG-13': '13+',
+                        'R': '17+',
+                        'NC-17': '18+',
+                        'NR': 'NR',
+                        'TV-MA': '17+'
+                    };
+                    const certLabel = certMap[m.certification] || m.certification;
+                    badgesHtml += `<span class="badge b-cert">${certLabel}</span>`;
+                }
+
+                document.getElementById('badges').innerHTML = badgesHtml;
+                
                 document.getElementById('badges').innerHTML = badgesHtml;
 
                 // Название и тэглайн

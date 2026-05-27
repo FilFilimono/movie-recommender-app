@@ -77,5 +77,7 @@ class UserPreferences:
             criteria["min_rating"] = self.min_rating
         if hasattr(self, 'keywords') and self.keywords:
             criteria["keywords"] = self.keywords
+        if self.certification: 
+            criteria["certification"] = self.certification
         return criteria
         

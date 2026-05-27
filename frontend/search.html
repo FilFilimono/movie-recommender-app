@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch — Поиск</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1c1c27;
+            --border: #2a2a3a;
+            --accent: #e8b34b;
+            --accent2: #c97d3f;
+            --text: #f0eeea;
+            --muted: #6b6b80;
+            --radius: 12px
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            min-height: 100vh
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(232, 179, 75, .05) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 48px;
+            background: rgba(10, 10, 15, .9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: .1em;
+            color: var(--accent);
+            text-decoration: none
+        }
+
+        .logo span {
+            color: var(--text)
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .btn-nav {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            display: inline-block
+        }
+
+        .btn-nav:hover {
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn-logout:hover {
+            border-color: #e05252;
+            color: #e05252
+        }
+
+        /* Hero поиска */
+        .search-hero {
+            padding: 64px 24px 48px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .search-eyebrow {
+            font-size: .72rem;
+            color: var(--accent);
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 12px
+        }
+
+        .search-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            letter-spacing: .04em;
+            margin-bottom: 32px
+        }
+
+        /* Поисковая строка */
+        .search-wrap {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 18px 56px 18px 24px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            font-size: 1.05rem;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(232, 179, 75, .1);
+        }
+
+        .search-input::placeholder {
+            color: var(--muted)
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 1.1rem;
+            pointer-events: none;
+            transition: color .2s;
+        }
+
+        .search-wrap:focus-within .search-icon {
+            color: var(--accent)
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 1rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+            display: none;
+            transition: color .2s;
+        }
+
+        .search-clear:hover {
+            color: var(--text)
+        }
+
+        .search-hint {
+            font-size: .82rem;
+            color: var(--muted);
+            text-align: center
+        }
+
+        /* Фильтры */
+        .filters {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            margin-bottom: 0;
+        }
+
+        .filter-chip {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+            color: var(--muted);
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .filter-chip.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(232, 179, 75, .08)
+        }
+
+        .filter-chip:hover:not(.active) {
+            border-color: var(--text);
+            color: var(--text)
+        }
+
+        /* Контейнер результатов */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 80px
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-top: 8px;
+        }
+
+        .results-count {
+            font-size: .85rem;
+            color: var(--muted)
+        }
+
+        .results-count span {
+            color: var(--text);
+            font-weight: 600
+        }
+
+        /* Сетка фильмов */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 18px
+        }
+
+        .movie-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column
+        }
+
+        .movie-card:hover {
+            border-color: rgba(232, 179, 75, .4);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, .4)
+        }
+
+        .poster {
+            aspect-ratio: 2/3;
+            background: var(--surface2);
+            position: relative;
+            overflow: hidden
+        }
+
+        .poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform .3s
+        }
+
+        .movie-card:hover .poster img {
+            transform: scale(1.04)
+        }
+
+        .poster-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--border)
+        }
+
+        .score-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(10, 10, 15, .85);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(232, 179, 75, .3);
+            border-radius: 6px;
+            padding: 3px 7px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--accent)
+        }
+
+        .like-btn {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(10, 10, 15, .7);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: all .2s;
+            opacity: 0
+        }
+
+        .movie-card:hover .like-btn,
+        .like-btn.liked {
+            opacity: 1
+        }
+
+        .like-btn.liked {
+            background: rgba(232, 75, 75, .2);
+            border-color: rgba(232, 75, 75, .5)
+        }
+
+        .card-body {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px
+        }
+
+        .card-title {
+            font-size: .85rem;
+            font-weight: 600;
+            line-height: 1.3
+        }
+
+        .card-meta {
+            font-size: .72rem;
+            color: var(--muted);
+            display: flex;
+            gap: 6px;
+            align-items: center
+        }
+
+        .card-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--border);
+            flex-shrink: 0
+        }
+
+        .card-genres {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 3px
+        }
+
+        .genre-tag {
+            font-size: .62rem;
+            padding: 2px 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted)
+        }
+
+        /* Состояния */
+        .state-wrap {
+            text-align: center;
+            padding: 80px 20px
+        }
+
+        .state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px
+        }
+
+        .state-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 8px;
+            letter-spacing: .04em
+        }
+
+        .state-desc {
+            font-size: .88rem;
+            color: var(--muted);
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto
+        }
+
+        /* Скелетон */
+        .skeleton-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden
+        }
+
+        .skeleton-poster {
+            aspect-ratio: 2/3;
+            background: var(--surface2);
+            animation: shimmer 1.5s infinite
+        }
+
+        .skeleton-body {
+            padding: 12px
+        }
+
+        .skeleton-line {
+            height: 11px;
+            border-radius: 3px;
+            background: var(--surface2);
+            animation: shimmer 1.5s infinite;
+            margin-bottom: 7px
+        }
+
+        .skeleton-line.short {
+            width: 55%
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                opacity: .4
+            }
+
+            50% {
+                opacity: .8
+            }
+        }
+
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 40px;
+            flex-wrap: wrap
+        }
+
+        .page-btn {
+            min-width: 38px;
+            height: 38px;
+            padding: 0 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            font-size: .82rem;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .page-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(232, 179, 75, .1)
+        }
+
+        .page-btn:hover:not(.active):not(:disabled) {
+            border-color: var(--text);
+            color: var(--text)
+        }
+
+        .page-btn:disabled {
+            opacity: .3;
+            cursor: not-allowed
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="/recommendations.html" class="logo">Cine<span>Match</span></a>
+        <div class="nav-right">
+            <span style="font-size:.82rem;color:var(--muted)" id="nav-user"></span>
+            <a href="/recommendations.html" class="btn-nav">★ Рекомендации</a>
+            <button class="btn-logout" onclick="logout()">Выйти</button>
+        </div>
+    </nav>
+
+    <!-- Hero поиска -->
+    <div class="search-hero">
+        <div class="search-eyebrow">База фильмов</div>
+        <div class="search-title">Найти фильм</div>
+
+        <div class="search-wrap">
+            <input type="text" class="search-input" id="search-input" placeholder="Введите название фильма..."
+                oninput="onInput()" onkeydown="onKey(event)" autocomplete="off">
+            <span class="search-icon" id="search-icon">🔍</span>
+            <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+        </div>
+
+        <div class="search-hint" id="search-hint">Введите минимум 2 символа для поиска</div>
+
+        <div class="filters" id="filters">
+            <div class="filter-chip active" data-sort="votes" onclick="setSort('votes',this)">По популярности</div>
+            <div class="filter-chip" data-sort="rating" onclick="setSort('rating',this)">По рейтингу</div>
+            <div class="filter-chip" data-sort="year" onclick="setSort('year',this)">По году (новые)</div>
+            <div class="filter-chip" data-sort="title" onclick="setSort('title',this)">По алфавиту</div>
+        </div>
+    </div>
+
+    <!-- Результаты -->
+    <div class="container">
+        <div id="results-header" class="results-header" style="display:none">
+            <div class="results-count">Найдено: <span id="count">—</span></div>
+        </div>
+        <div id="grid"></div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/index.html';
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('nav-user').textContent = 'Привет, ' + (user.username || '');
+
+        let query = '';
+        let sortBy = 'votes';
+        let page = 1;
+        let totalPages = 1;
+        let totalCount = 0;
+        let liked = new Set();
+        let debounceTimer = null;
+        const LIMIT = 30;
+
+        async function logout() {
+            try { await fetch('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } }); }
+            finally { localStorage.clear(); window.location.href = '/index.html'; }
+        }
+
+        // Загружаем лайки один раз
+        async function loadLikes() {
+            try {
+                const r = await fetch('/api/likes', { headers: { 'Authorization': 'Bearer ' + token } });
+                if (r.ok) liked = new Set((await r.json()).movie_ids);
+            } catch (e) { }
+        }
+
+        function onInput() {
+            const val = document.getElementById('search-input').value;
+            document.getElementById('search-clear').style.display = val ? 'block' : 'none';
+            document.getElementById('search-icon').style.display = val ? 'none' : 'block';
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                query = val.trim();
+                page = 1;
+                search();
+            }, 300);
+        }
+
+        function onKey(e) {
+            if (e.key === 'Enter') {
+                clearTimeout(debounceTimer);
+                query = document.getElementById('search-input').value.trim();
+                page = 1;
+                search();
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-clear').style.display = 'none';
+            document.getElementById('search-icon').style.display = 'block';
+            query = '';
+            page = 1;
+            showEmpty('initial');
+        }
+
+        function setSort(s, el) {
+            sortBy = s;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            page = 1;
+            if (query.length >= 2) search();
+        }
+
+        async function search() {
+            if (query.length < 2) {
+                showEmpty('initial');
+                return;
+            }
+            showSkeletons();
+
+            try {
+                const params = new URLSearchParams({
+                    q: query,
+                    page: page,
+                    limit: LIMIT,
+                    sort: sortBy,
+                });
+                const res = await fetch('/api/search?' + params);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+
+                totalCount = data.total;
+                totalPages = Math.ceil(data.total / LIMIT);
+
+                if (data.movies.length === 0) {
+                    showEmpty('noresult');
+                    return;
+                }
+
+                document.getElementById('results-header').style.display = 'flex';
+                document.getElementById('count').textContent =
+                    Number(data.total).toLocaleString('ru') + ' фильм' + plural(data.total);
+                document.getElementById('search-hint').textContent = '';
+
+                renderMovies(data.movies);
+                renderPagination();
+
+            } catch (e) {
+                showEmpty('error');
+            }
+        }
+
+        function plural(n) {
+            if (n % 100 >= 11 && n % 100 <= 19) return 'ов';
+            if (n % 10 === 1) return '';
+            if (n % 10 >= 2 && n % 10 <= 4) return 'а';
+            return 'ов';
+        }
+
+        function parseList(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            try { return JSON.parse(val.replace(/'/g, '"')); } catch (e) { }
+            return String(val).split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        function renderMovies(movies) {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = movies.map((m, i) => {
+                const rating = m.tmdb_rating ? Number(m.tmdb_rating).toFixed(1) : null;
+                const year = m.release_date ? m.release_date.slice(0, 4) : '';
+                const genres = parseList(m.genres).slice(0, 2)
+                    .map(g => `<span class="genre-tag">${g}</span>`).join('');
+                const isLiked = liked.has(m.movie_id);
+
+                return `
+    <a class="movie-card" href="/movie.html?id=${m.movie_id}"
+       style="animation:cardIn .25s ${Math.min(i * 0.025, 0.4)}s ease both">
+      <div class="poster">
+        ${m.poster_url
+                        ? `<img src="${m.poster_url}" alt="${m.title}" loading="lazy"
+                  onerror="this.parentElement.innerHTML='<div class=poster-placeholder>🎬</div>'">`
+                        : `<div class="poster-placeholder">🎬</div>`}
+        ${rating ? `<div class="score-badge">★ ${rating}</div>` : ''}
+        <div class="like-btn ${isLiked ? 'liked' : ''}"
+             onclick="toggleLike(event,${m.movie_id},this)">
+          ${isLiked ? '♥' : '♡'}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${m.title || '—'}</div>
+        <div class="card-meta">
+          ${year ? `<span>${year}</span>` : ''}
+          ${year && rating ? `<span class="card-dot"></span>` : ''}
+          ${rating ? `<span>${rating}/10</span>` : ''}
+        </div>
+        <div class="card-genres">${genres}</div>
+      </div>
+    </a>`;
+            }).join('');
+        }
+
+        function renderPagination() {
+            const pag = document.getElementById('pagination');
+            if (totalPages <= 1) { pag.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goTo(${page - 1})" ${page <= 1 ? 'disabled' : ''}>←</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || Math.abs(i - page) <= 2) {
+                    html += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="goTo(${i})">${i}</button>`;
+                } else if (Math.abs(i - page) === 3) {
+                    html += `<button class="page-btn" disabled>…</button>`;
+                }
+            }
+            html += `<button class="page-btn" onclick="goTo(${page + 1})" ${page >= totalPages ? 'disabled' : ''}>→</button>`;
+            pag.innerHTML = html;
+        }
+
+        function goTo(p) {
+            if (p < 1 || p > totalPages) return;
+            page = p;
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+            search();
+        }
+
+        function showSkeletons() {
+            document.getElementById('results-header').style.display = 'none';
+            document.getElementById('pagination').innerHTML = '';
+            document.getElementById('search-hint').textContent = '';
+            document.getElementById('grid').innerHTML =
+                Array(LIMIT).fill(0).map(() => `
+      <div class="skeleton-card">
+        <div class="skeleton-poster"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>`).join('');
+        }
+
+        function showEmpty(type) {
+            document.getElementById('results-header').style.display = 'none';
+            document.getElementById('pagination').innerHTML = '';
+            const states = {
+                initial: { icon: '🎬', title: 'Поиск по базе', desc: 'Введите название фильма — найдём среди 95 000+ картин' },
+                noresult: { icon: '🔍', title: 'Ничего не найдено', desc: `По запросу «${query}» фильмов не найдено. Проверьте написание или попробуйте другое название` },
+                error: { icon: '⚠️', title: 'Ошибка', desc: 'Не удалось выполнить поиск. Попробуйте ещё раз' },
+            };
+            const s = states[type] || states.initial;
+            document.getElementById('grid').innerHTML = `
+    <div class="state-wrap" style="grid-column:1/-1">
+      <div class="state-icon">${s.icon}</div>
+      <div class="state-title">${s.title}</div>
+      <div class="state-desc">${s.desc}</div>
+    </div>`;
+            if (type === 'initial') {
+                document.getElementById('search-hint').textContent = 'Введите минимум 2 символа для поиска';
+            }
+        }
+
+        async function toggleLike(event, movieId, el) {
+            event.preventDefault(); event.stopPropagation();
+            const isLiked = liked.has(movieId);
+            try {
+                const res = await fetch(`/api/like/${movieId}`, {
+                    method: isLiked ? 'DELETE' : 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    if (isLiked) { liked.delete(movieId); el.textContent = '♡'; el.classList.remove('liked'); }
+                    else { liked.add(movieId); el.textContent = '♥'; el.classList.add('liked'); }
+                }
+            } catch (e) { }
+        }
+
+        // Инициализация
+        loadLikes();
+        showEmpty('initial');
+        // Фокус на поле поиска
+        document.getElementById('search-input').focus();
+    </script>
+</body>
+
+</html>

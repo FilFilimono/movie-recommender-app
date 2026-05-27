@@ -317,33 +317,42 @@
             color: var(--muted)
         }
 
-        .sim-bar {
-            height: 2px;
-            background: var(--surface2);
-            border-radius: 1px;
-            margin-top: 8px
+        /* Match label вместо sim-bar */
+        .match-label {
+            font-size: .68rem;
+            font-weight: 600;
+            margin-top: 8px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            letter-spacing: .02em
         }
 
-        .sim-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 1px
+        .match-great {
+            background: rgba(232, 179, 75, .15);
+            color: #e8b34b;
+            border: 1px solid rgba(232, 179, 75, .3)
         }
 
-        .sim-label {
-            font-size: .66rem;
-            color: var(--muted);
-            margin-top: 3px;
-            text-align: right
+        .match-good {
+            background: rgba(123, 198, 126, .12);
+            color: #7bc67e;
+            border: 1px solid rgba(123, 198, 126, .3)
         }
 
-        /* Loading */
-        .loading-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px
+        .match-ok {
+            background: rgba(107, 159, 212, .12);
+            color: #6b9fd4;
+            border: 1px solid rgba(107, 159, 212, .3)
         }
 
+        .match-maybe {
+            background: rgba(107, 107, 128, .1);
+            color: #9b9bb0;
+            border: 1px solid rgba(107, 107, 128, .2)
+        }
+
+        /* Skeleton */
         .skeleton-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -444,6 +453,7 @@
         <div class="logo">Cine<span>Match</span></div>
         <div class="nav-right">
             <span class="nav-user" id="nav-user"></span>
+            <a href="/search.html" class="btn-outline">🔍 Поиск</a>
             <a href="/onboarding.html" class="btn-outline">⚙ Изменить вкус</a>
             <button class="btn-logout" onclick="logout()">Выйти</button>
         </div>
@@ -459,9 +469,10 @@
         <div class="list-controls">
             <div class="results-count">Найдено: <span id="count">—</span> фильмов</div>
             <select class="sort-select" onchange="sortMovies(this.value)">
-                <option value="similarity">По совпадению</option>
+                <option value="default">По релевантности</option>
                 <option value="rating">По рейтингу</option>
-                <option value="year">По году</option>
+                <option value="year">По году (новые)</option>
+                <option value="year_asc">По году (старые)</option>
             </select>
         </div>
 
@@ -480,27 +491,31 @@
 
         async function logout() {
             try {
-                await fetch('/api/logout', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                await fetch('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
             } finally {
                 localStorage.clear();
                 window.location.href = '/index.html';
             }
         }
 
+        // Метка совпадения вместо процентов
+        function getMatchLabel(similarity) {
+            if (similarity >= 0.15) return { label: '✦ Отличное совпадение', cls: 'match-great' };
+            if (similarity >= 0.10) return { label: '✓ Хорошее совпадение', cls: 'match-good' };
+            if (similarity >= 0.05) return { label: '~ Похожий фильм', cls: 'match-ok' };
+            return { label: '◌ Возможно понравится', cls: 'match-maybe' };
+        }
+
         function showSkeletons() {
-            const grid = document.getElementById('movies-grid');
-            grid.innerHTML = Array(12).fill(0).map(() => `
-    <div class="skeleton-card">
-      <div class="skeleton-poster"></div>
-      <div class="skeleton-body">
-        <div class="skeleton-line"></div>
-        <div class="skeleton-line short"></div>
-      </div>
-    </div>
-  `).join('');
+            document.getElementById('movies-grid').innerHTML =
+                Array(12).fill(0).map(() => `
+      <div class="skeleton-card">
+        <div class="skeleton-poster"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>`).join('');
         }
 
         async function loadRecommendations() {
@@ -509,34 +524,17 @@
                 const res = await fetch('/api/recommendations?n=100', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
+                if (res.status === 401) { localStorage.clear(); window.location.href = '/index.html'; return; }
+                if (res.status === 400) { window.location.href = '/onboarding.html'; return; }
 
-                if (res.status === 401) {
-                    localStorage.clear();
-                    window.location.href = '/index.html';
-                    return;
-                }
-                if (res.status === 400) {
-                    // Юзер не проходил тест
-                    window.location.href = '/onboarding.html';
-                    return;
-                }
+                allMovies = await res.json();
 
-                const movies = await res.json();
-                allMovies = movies;
+                // Лайки
+                const likesRes = await fetch('/api/likes', { headers: { 'Authorization': 'Bearer ' + token } });
+                if (likesRes.ok) liked = new Set((await likesRes.json()).movie_ids);
 
-                // Загружаем лайки
-                const likesRes = await fetch('/api/likes', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (likesRes.ok) {
-                    const likesData = await likesRes.json();
-                    liked = new Set(likesData.movie_ids);
-                }
-
-                // Subtitle с предпочтениями
-                const prefsRes = await fetch('/api/preferences', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                // Subtitle
+                const prefsRes = await fetch('/api/preferences', { headers: { 'Authorization': 'Bearer ' + token } });
                 if (prefsRes.ok) {
                     const prefs = await prefsRes.json();
                     if (prefs) {
@@ -544,13 +542,21 @@
                         if (prefs.genres?.length) parts.push(prefs.genres.join(', '));
                         if (prefs.year_from) parts.push(prefs.year_from + '–' + prefs.year_to);
                         if (prefs.min_rating) parts.push('рейтинг ' + prefs.min_rating + '+');
+                        if (prefs.certification) {
+                            const certMap = {
+                                'G': '0+', 'PG': 'PG', 'PG-13': '13+',
+                                'R': '17+', 'NC-17': '18+'
+                            };
+                            const labels = prefs.certification.split(',')
+                                .map(c => certMap[c.trim()] || c.trim())
+                                .join(', ');
+                            parts.push('возраст ' + labels);
+                        }
                         document.getElementById('page-subtitle').textContent =
                             parts.length ? 'По критериям: ' + parts.join(' · ') : 'Топ фильмы по вашим вкусам';
                     }
                 }
-
                 renderMovies(allMovies);
-
             } catch (e) {
                 document.getElementById('movies-grid').innerHTML = `
       <div class="empty-state">
@@ -562,11 +568,18 @@
             }
         }
 
+        // Перевод certification в читаемый вид
+        function certLabel(cert) {
+            const map = { 'G': '0+', 'PG': 'PG', 'PG-13': '13+', 'R': '17+', 'NC-17': '18+', 'NR': 'NR', 'TV-MA': '17+' };
+            return map[cert] || cert;
+        }
+
         function sortMovies(by) {
             const sorted = [...allMovies];
             if (by === 'rating') sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
             else if (by === 'year') sorted.sort((a, b) => (b.release_year || 0) - (a.release_year || 0));
-            else sorted.sort((a, b) => b.similarity - a.similarity);
+            else if (by === 'year_asc') sorted.sort((a, b) => (a.release_year || 0) - (b.release_year || 0));
+            // default — оставляем порядок сервера (по релевантности)
             renderMovies(sorted);
         }
 
@@ -586,8 +599,8 @@
             }
 
             grid.innerHTML = movies.map((m, i) => {
-                const sim = Math.round(m.similarity * 100);
-                const rating = m.rating ? m.rating.toFixed(1) : null;
+                const match = getMatchLabel(m.similarity);
+                const rating = m.rating ? Number(m.rating).toFixed(1) : null;
                 const year = m.release_year || '';
                 const genres = (m.genres || []).slice(0, 2).map(g =>
                     `<span class="genre-tag">${g}</span>`).join('');
@@ -595,7 +608,7 @@
 
                 return `
     <a class="movie-card" href="/movie.html?id=${m.movie_id}"
-       style="animation:cardIn .3s ${i * 0.03}s ease both">
+       style="animation:cardIn .3s ${Math.min(i * 0.03, 0.5)}s ease both">
       <div class="poster">
         ${m.poster_url
                         ? `<img src="${m.poster_url}" alt="${m.title}" loading="lazy"
@@ -603,7 +616,7 @@
                         : `<div class="poster-placeholder">🎬</div>`}
         ${rating ? `<div class="score-badge">★ ${rating}</div>` : ''}
         <div class="like-btn ${isLiked ? 'liked' : ''}"
-             onclick="toggleLike(event, ${m.movie_id}, this)">
+             onclick="toggleLike(event,${m.movie_id},this)">
           ${isLiked ? '♥' : '♡'}
         </div>
       </div>
@@ -612,25 +625,21 @@
         <div class="card-meta">
           ${year ? `<span>${year}</span>` : ''}
           ${year && rating ? `<span class="card-dot"></span>` : ''}
-          ${rating ? `<span>${rating} / 10</span>` : ''}
+          ${rating ? `<span>${rating}/10</span>` : ''}
         </div>
         <div class="card-genres">${genres}</div>
-        <div class="sim-bar"><div class="sim-fill" style="width:${sim}%"></div></div>
-        <div class="sim-label">Совпадение ${sim}%</div>
+        <span class="match-label ${match.cls}">${match.label}</span>
       </div>
     </a>`;
             }).join('');
         }
 
         async function toggleLike(event, movieId, el) {
-            event.preventDefault();
-            event.stopPropagation();
+            event.preventDefault(); event.stopPropagation();
             const isLiked = liked.has(movieId);
-            const method = isLiked ? 'DELETE' : 'POST';
-
             try {
                 const res = await fetch(`/api/like/${movieId}`, {
-                    method,
+                    method: isLiked ? 'DELETE' : 'POST',
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 if (res.ok) {

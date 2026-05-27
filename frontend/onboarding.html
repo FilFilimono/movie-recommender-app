@@ -163,9 +163,10 @@
             max-width: 500px
         }
 
+        /* Жанры */
         .genre-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 10px;
             margin-bottom: 40px
         }
@@ -198,10 +199,11 @@
         }
 
         .genre-name {
-            font-size: .82rem;
+            font-size: .78rem;
             font-weight: 500
         }
 
+        /* Слайдеры */
         .range-wrap {
             margin-bottom: 40px
         }
@@ -243,6 +245,7 @@
             color: var(--muted)
         }
 
+        /* Рейтинг */
         .stars {
             display: flex;
             gap: 8px;
@@ -278,62 +281,105 @@
             font-weight: 600
         }
 
-        .tag-input-wrap {
+        /* Возрастной рейтинг */
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 40px
+        }
+
+        .cert-card {
+            padding: 18px 16px;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             background: var(--surface);
-            padding: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            cursor: text;
-            transition: border-color .2s;
-            margin-bottom: 12px
-        }
-
-        .tag-input-wrap:focus-within {
-            border-color: var(--accent)
-        }
-
-        .tag {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 10px;
-            background: rgba(232, 179, 75, .15);
-            border: 1px solid rgba(232, 179, 75, .4);
-            border-radius: 20px;
-            font-size: .8rem;
-            color: var(--accent)
-        }
-
-        .tag-remove {
             cursor: pointer;
-            opacity: .6;
-            font-size: 1rem
+            transition: all .18s;
+            user-select: none;
+            position: relative
         }
 
-        .tag-remove:hover {
-            opacity: 1
+        .cert-card:hover {
+            border-color: var(--accent);
+            background: var(--surface2)
         }
 
-        .tag-input-wrap input {
-            border: none;
-            outline: none;
-            background: transparent;
-            color: var(--text);
-            font-family: 'Manrope', sans-serif;
-            font-size: .9rem;
-            min-width: 160px;
-            flex: 1;
-            padding: 2px 4px
+        .cert-card.selected {
+            border-color: var(--accent);
+            background: rgba(232, 179, 75, .08)
         }
 
-        .tag-hint {
-            font-size: .78rem;
-            color: var(--muted)
+        .cert-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            color: var(--accent);
+            font-size: .85rem;
+            font-weight: 600
         }
 
+        .cert-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: .85rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: .04em
+        }
+
+        .cert-name {
+            font-size: .88rem;
+            font-weight: 500;
+            margin-bottom: 4px
+        }
+
+        .cert-desc {
+            font-size: .75rem;
+            color: var(--muted);
+            line-height: 1.4
+        }
+
+        .cert-count {
+            font-size: .68rem;
+            color: var(--muted);
+            margin-top: 6px
+        }
+
+        /* any-rating card */
+        .cert-card.any .cert-badge {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .cert-card.g .cert-badge {
+            background: rgba(123, 198, 126, .15);
+            color: #7bc67e
+        }
+
+        .cert-card.pg .cert-badge {
+            background: rgba(107, 159, 212, .15);
+            color: #6b9fd4
+        }
+
+        .cert-card.pg13 .cert-badge {
+            background: rgba(232, 179, 75, .15);
+            color: #e8b34b
+        }
+
+        .cert-card.r .cert-badge {
+            background: rgba(224, 130, 82, .15);
+            color: #e08252
+        }
+
+        .cert-card.nc17 .cert-badge {
+            background: rgba(224, 82, 82, .15);
+            color: #e05252
+        }
+
+        /* Навигация */
         .step-nav {
             display: flex;
             justify-content: space-between;
@@ -489,21 +535,28 @@
                         class="genre-icon">🧙</span>
                     <div class="genre-name">Фэнтези</div>
                 </div>
-                <div class="genre-card" data-genre="Family" onclick="toggleGenre(this)">
-                    <span class="genre-icon">👨‍👩‍👧</span>
+                <div class="genre-card" data-genre="Family" onclick="toggleGenre(this)"><span
+                        class="genre-icon">👨‍👩‍👧</span>
                     <div class="genre-name">Семейный</div>
                 </div>
-                <div class="genre-card" data-genre="History" onclick="toggleGenre(this)">
-                    <span class="genre-icon">🏛️</span>
+                <div class="genre-card" data-genre="History" onclick="toggleGenre(this)"><span
+                        class="genre-icon">🏛️</span>
                     <div class="genre-name">История</div>
                 </div>
-                <div class="genre-card" data-genre="Music" onclick="toggleGenre(this)">
-                    <span class="genre-icon">🎵</span>
+                <div class="genre-card" data-genre="Music" onclick="toggleGenre(this)"><span
+                        class="genre-icon">🎵</span>
                     <div class="genre-name">Музыка</div>
                 </div>
-                <div class="genre-card" data-genre="Western" onclick="toggleGenre(this)">
-                    <span class="genre-icon">🤠</span>
+                <div class="genre-card" data-genre="Mystery" onclick="toggleGenre(this)"><span
+                        class="genre-icon">🔍</span>
+                    <div class="genre-name">Мистика</div>
+                </div>
+                <div class="genre-card" data-genre="Western" onclick="toggleGenre(this)"><span
+                        class="genre-icon">🤠</span>
                     <div class="genre-name">Вестерн</div>
+                </div>
+                <div class="genre-card" data-genre="War" onclick="toggleGenre(this)"><span class="genre-icon">⚔️</span>
+                    <div class="genre-name">Военный</div>
                 </div>
             </div>
             <div class="step-nav">
@@ -545,7 +598,11 @@
         <div class="step" id="step-3">
             <div class="step-eyebrow">Шаг 3</div>
             <div class="step-title">Минимальный рейтинг</div>
-            <div class="step-desc">Ниже какого рейтинга фильмы вам не интересны?</div>
+            <div class="step-desc">
+                Ниже какого рейтинга фильмы вам не интересны?
+                <span style="color:var(--accent);font-weight:500"> Рекомендуем выбрать 7.0+</span> —
+                выше рейтинг, меньше фильмов, но все они качественные.
+            </div>
             <div style="margin-bottom:40px">
                 <div class="stars" id="stars">
                     <div class="star" data-val="2" onclick="setRating(2)">★</div>
@@ -567,39 +624,83 @@
             </div>
         </div>
 
-        <!-- ШАГ 4: Актёры -->
+        <!-- ШАГ 4: Возрастной рейтинг (НОВЫЙ) -->
         <div class="step" id="step-4">
             <div class="step-eyebrow">Шаг 4</div>
-            <div class="step-title">Любимые актёры</div>
-            <div class="step-desc">Введите имена актёров или режиссёра и нажмите Enter.</div>
-            <div style="margin-bottom:28px">
-                <label
-                    style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Актёры</label>
-                <div class="tag-input-wrap" id="cast-wrap" onclick="document.getElementById('cast-input').focus()">
-                    <input type="text" id="cast-input" placeholder="Например: Leonardo DiCaprio"
-                        onkeydown="handleTag(event,'cast')">
-                </div>
-                <div class="tag-hint">Нажмите Enter чтобы добавить</div>
+            <div class="step-title">Возрастной рейтинг</div>
+            <div class="step-desc">
+                Выберите один или несколько подходящих рейтингов.
+                <span style="color:var(--accent);font-weight:500"> Рекомендуем оставить «Без ограничений»</span> —
+                так вы увидите больше фильмов.
             </div>
-            <div>
-                <label
-                    style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Режиссёр</label>
-                <div class="tag-input-wrap" id="dir-wrap" onclick="document.getElementById('dir-input').focus()">
-                    <input type="text" id="dir-input" placeholder="Например: Christopher Nolan"
-                        onkeydown="handleTag(event,'dir')">
+
+            <div class="cert-grid">
+
+                <div class="cert-card any selected" data-cert="any" onclick="toggleCert(this)">
+                    <span class="cert-badge">Все</span>
+                    <div class="cert-name">Без ограничений</div>
+                    <div class="cert-desc">Показывать фильмы любого возрастного рейтинга</div>
+                    <div class="cert-count">95 501 фильмов</div>
+                </div>
+
+                <div class="cert-card g" data-cert="G" onclick="toggleCert(this)">
+                    <span class="cert-badge">G · 0+</span>
+                    <div class="cert-name">Для всех</div>
+                    <div class="cert-desc">Подходит для любого возраста, семейный просмотр</div>
+                    <div class="cert-count">≈ 2 045 фильмов</div>
+                </div>
+
+                <div class="cert-card pg" data-cert="PG" onclick="toggleCert(this)">
+                    <span class="cert-badge">PG · 6+</span>
+                    <div class="cert-name">С родителями</div>
+                    <div class="cert-desc">Рекомендуется присутствие родителей</div>
+                    <div class="cert-count">≈ 4 615 фильмов</div>
+                </div>
+
+                <div class="cert-card pg13" data-cert="PG-13" onclick="toggleCert(this)">
+                    <span class="cert-badge">PG-13 · 13+</span>
+                    <div class="cert-name">С 13 лет</div>
+                    <div class="cert-desc">Некоторые сцены могут не подойти детям до 13</div>
+                    <div class="cert-count">≈ 5 183 фильмов</div>
+                </div>
+
+                <div class="cert-card r" data-cert="R" onclick="toggleCert(this)">
+                    <span class="cert-badge">R · 17+</span>
+                    <div class="cert-name">С 17 лет</div>
+                    <div class="cert-desc">Насилие, ненормативная лексика, взрослые темы</div>
+                    <div class="cert-count">≈ 12 174 фильмов</div>
+                </div>
+
+                <div class="cert-card nc17" data-cert="NC-17" onclick="toggleCert(this)">
+                    <span class="cert-badge">NC-17 · 18+</span>
+                    <div class="cert-name">18+</div>
+                    <div class="cert-desc">Только для взрослых, жёсткий контент</div>
+                    <div class="cert-count">≈ 194 фильмов</div>
+                </div>
+
+            </div>
+
+            <div
+                style="padding:14px 16px;background:rgba(232,179,75,.05);border:1px solid rgba(232,179,75,.15);border-radius:var(--radius);margin-bottom:32px">
+                <div style="font-size:.78rem;color:var(--muted);line-height:1.6">
+                    ℹ️ У многих фильмов возрастной рейтинг не указан (≈ 10 589 фильмов). При выборе конкретного рейтинга
+                    они будут исключены.
+                    Если хотите видеть больше фильмов — выберите <strong style="color:var(--text)">Без
+                        ограничений</strong>.
                 </div>
             </div>
-            <div class="step-nav" style="margin-top:32px">
+
+            <div class="step-nav">
                 <button class="btn-back" onclick="prevStep()">← Назад</button>
                 <button class="btn-next" id="submit-btn" onclick="submitPreferences()">
                     🎬 Найти фильмы
                 </button>
             </div>
         </div>
+
     </div>
 
     <script>
-        // Проверка авторизации
         const token = localStorage.getItem('token');
         if (!token) window.location.href = '/index.html';
         const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -610,16 +711,18 @@
 
         const prefs = {
             genres: [], cast: [], director: '',
-            year_from: 2000, year_to: 2024,
-            min_rating: null, max_runtime: 240, keywords: []
+            year_from: 1970, year_to: 2024,
+            min_rating: null, max_runtime: 240,
+            keywords: [], certification: ''
         };
+
+        let selectedCerts = []; 
 
         function goToStep(n) {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-' + n).classList.add('active');
             currentStep = n;
-            const pct = (n / totalSteps) * 100;
-            document.getElementById('prog-fill').style.width = pct + '%';
+            document.getElementById('prog-fill').style.width = (n / totalSteps * 100) + '%';
             document.getElementById('prog-count').textContent = n + ' / ' + totalSteps;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -638,7 +741,8 @@
             let t = +document.getElementById('year-to').value;
             prefs.year_from = Math.min(f, t);
             prefs.year_to = Math.max(f, t);
-            document.getElementById('year-display').textContent = prefs.year_from + ' — ' + prefs.year_to;
+            document.getElementById('year-display').textContent =
+                prefs.year_from + ' — ' + prefs.year_to;
         }
 
         function setRating(val) {
@@ -648,41 +752,40 @@
             document.getElementById('rating-val').textContent = val + '.0+';
         }
 
-        // Теги для актёров и режиссёра
-        const castTags = [], dirTags = [];
-        function handleTag(e, type) {
-            if (e.key !== 'Enter') return;
-            const inp = document.getElementById(type === 'cast' ? 'cast-input' : 'dir-input');
-            const val = inp.value.trim();
-            if (!val) return;
-            inp.value = '';
-            if (type === 'cast') { castTags.push(val); renderTags('cast-wrap', 'cast-input', castTags, 'cast'); }
-            else { dirTags.length = 0; dirTags.push(val); renderTags('dir-wrap', 'dir-input', dirTags, 'dir'); }
-        }
-        function renderTags(wrapId, inputId, arr, type) {
-            const wrap = document.getElementById(wrapId);
-            const inp = document.getElementById(inputId);
-            wrap.innerHTML = '';
-            arr.forEach((t, i) => {
-                const tag = document.createElement('div');
-                tag.className = 'tag';
-                tag.innerHTML = `${t}<span class="tag-remove" onclick="removeTag(${i},'${type}')">×</span>`;
-                wrap.appendChild(tag);
-            });
-            wrap.appendChild(inp);
-            if (type === 'cast') prefs.cast = [...arr];
-            else prefs.director = arr[0] || '';
-        }
-        function removeTag(i, type) {
-            if (type === 'cast') { castTags.splice(i, 1); renderTags('cast-wrap', 'cast-input', castTags, 'cast'); }
-            else { dirTags.splice(i, 1); renderTags('dir-wrap', 'dir-input', dirTags, 'dir'); }
+
+        function toggleCert(el) {
+            const cert = el.dataset.cert;
+            const anyCard = document.querySelector('.cert-card[data-cert="any"]');
+
+            if (cert === 'any') {
+                document.querySelectorAll('.cert-card').forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+                selectedCerts = [];
+                prefs.certification = '';
+                return;
+            }
+
+            if (anyCard) anyCard.classList.remove('selected');
+            el.classList.toggle('selected');
+
+            if (el.classList.contains('selected')) {
+                if (!selectedCerts.includes(cert)) selectedCerts.push(cert);
+            } else {
+                selectedCerts = selectedCerts.filter(c => c !== cert);
+            }
+
+            if (selectedCerts.length === 0) {
+                if (anyCard) anyCard.classList.add('selected');
+                prefs.certification = '';
+            } else {
+                prefs.certification = selectedCerts.join(',');
+            }
         }
 
         async function submitPreferences() {
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
             btn.innerHTML = '<div class="spinner"></div> Сохраняем...';
-
             try {
                 const res = await fetch('/api/preferences', {
                     method: 'POST',
@@ -692,15 +795,12 @@
                     },
                     body: JSON.stringify(prefs)
                 });
-
                 if (!res.ok) {
                     const data = await res.json();
                     alert(data.detail || 'Ошибка сохранения');
                     return;
                 }
-
                 window.location.href = '/recommendations.html';
-
             } catch (e) {
                 alert('Ошибка соединения с сервером');
             } finally {

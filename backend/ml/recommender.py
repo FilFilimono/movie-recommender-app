@@ -22,18 +22,18 @@ class RecommenderEngine:
 
        
         query = hstack([
-        num_vec   * 0.8,
-        tfidf_vec * 3.0,
-        emb_vec   * 2.0,
+        num_vec   * 0.05,
+        tfidf_vec * 7.0,
+        emb_vec   * 3.0,
     ])
         query = normalize(query, norm="l2")
 
        
-        n_search = min(n * 5, self._loader.feature_matrix.shape[0])
+        n_search = min(n * 10, self._loader.feature_matrix.shape[0])
         distances, indices = self._loader.knn.kneighbors(query, n_neighbors=n_search)
 
 
-        results = self._build_results(indices[0], distances[0], n)
+        results = self._build_results(indices[0], distances[0], n * 10)
         return results
 
 

@@ -84,18 +84,14 @@ def get_preferences(authorization: str = Header(None)):
 @router.get("/recommendations")
 def get_recommendations(
     n: int = 100,
+    offset: int = 0,
     authorization: str = Header(None),
 ):
 
     user_id = _get_user_id(authorization)
-
     if not _prefs_repo.exists(user_id):
-        raise HTTPException(
-            status_code=400,
-            detail="Сначала пройдите тест предпочтений"
-        )
-
-    movies = _recommend_service.get_for_user(user_id, n=n)
+        raise HTTPException(status_code=400, detail="Сначала пройдите тест")
+    movies = _recommend_service.get_for_user(user_id, n=n, offset=offset)
     return [movie.to_dict() for movie in movies]
 
 

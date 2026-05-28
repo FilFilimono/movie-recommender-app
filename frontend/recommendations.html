@@ -499,10 +499,10 @@
             }
         }
 
-        function refreshRecs() {
-                sessionStorage.removeItem('recommendations');
-                loadRecommendations();
-            }
+        // function refreshRecs() {
+        //         sessionStorage.removeItem('recommendations');
+        //         loadRecommendations();
+        //     }
 
         // Метка совпадения вместо процентов
         function getMatchLabel(similarity) {
@@ -525,19 +525,36 @@
         }
 
         async function loadRecommendations() {
-                const cached = sessionStorage.getItem('recommendations');
-                if (cached) {
-                    const data = JSON.parse(cached);
-                    allMovies = data.movies;
-                    liked = new Set(data.liked);
-                    document.getElementById('page-subtitle').textContent = data.subtitle || '';
-                    renderMovies(allMovies);
-                    return;
+                
+                const navType = performance.getEntriesByType('navigation')[0]?.type;
+                const fromOnboarding = document.referrer.includes('onboarding');
+                if (navType === 'reload' || fromOnboarding) {
+                sessionStorage.removeItem('recs_cache');
                 }
 
+                // Есть кеш — используем (когда вернулись с карточки фильма)
+                const cached = sessionStorage.getItem('recs_cache');
+                if (cached) {
+                    try {
+                        const data = JSON.parse(cached);
+                        allMovies = data.movies;
+                        liked = new Set(data.liked || []);
+                        document.getElementById('page-subtitle').textContent = data.subtitle || '';
+                        renderMovies(allMovies);
+                        return;
+                    } catch (e) {
+                        sessionStorage.removeItem('recs_cache');
+                    }
+                }
+
+                // Нет кеша — загружаем с сервера
+                await fetchRecommendations();
+            }
+
+            async function fetchRecommendations(url = '/api/recommendations?n=100') {
                 showSkeletons();
                 try {
-                    const res = await fetch('/api/recommendations?n=100', {
+                    const res = await fetch(url, {
                         headers: { 'Authorization': 'Bearer ' + token }
                     });
                     if (res.status === 401) { localStorage.clear(); window.location.href = '/index.html'; return; }
@@ -548,28 +565,11 @@
                     const likesRes = await fetch('/api/likes', { headers: { 'Authorization': 'Bearer ' + token } });
                     if (likesRes.ok) liked = new Set((await likesRes.json()).movie_ids);
 
-                    const prefsRes = await fetch('/api/preferences', { headers: { 'Authorization': 'Bearer ' + token } });
-                    let subtitle = 'Топ фильмы по вашим вкусам';
-                    if (prefsRes.ok) {
-                        const prefs = await prefsRes.json();
-                        if (prefs) {
-                            const parts = [];
-                            if (prefs.genres?.length) parts.push(prefs.genres.join(', '));
-                            if (prefs.year_from) parts.push(prefs.year_from + '–' + prefs.year_to);
-                            if (prefs.min_rating) parts.push('рейтинг ' + prefs.min_rating + '+');
-                            if (prefs.certification) {
-                                const certMap = { 'G': '0+', 'PG': 'PG', 'PG-13': '13+', 'R': '17+', 'NC-17': '18+' };
-                                const labels = prefs.certification.split(',')
-                                    .map(c => certMap[c.trim()] || c.trim()).join(', ');
-                                parts.push('возраст ' + labels);
-                            }
-                            if (parts.length) subtitle = 'По критериям: ' + parts.join(' · ');
-                        }
-                    }
+                    const subtitle = await buildSubtitle();
                     document.getElementById('page-subtitle').textContent = subtitle;
 
-                    // Сохраняем в sessionStorage — живёт только пока открыта вкладка
-                    sessionStorage.setItem('recommendations', JSON.stringify({
+                    // Сохраняем в кеш
+                    sessionStorage.setItem('recs_cache', JSON.stringify({
                         movies: allMovies,
                         liked: Array.from(liked),
                         subtitle: subtitle,
@@ -581,25 +581,59 @@
       <div class="empty-state">
         <div class="empty-icon">⚠️</div>
         <div class="empty-title">Ошибка загрузки</div>
-        <button class="btn-primary" onclick="loadRecommendations()">Повторить</button>
+        <button class="btn-primary" onclick="fetchRecommendations()">Повторить</button>
       </div>`;
                 }
             }
 
-        // Перевод certification в читаемый вид
+            async function buildSubtitle() {
+                try {
+                    const prefsRes = await fetch('/api/preferences', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (!prefsRes.ok) return 'Топ фильмы по вашим вкусам';
+                    const prefs = await prefsRes.json();
+                    if (!prefs) return 'Топ фильмы по вашим вкусам';
+                    const parts = [];
+                    if (prefs.genres?.length) parts.push(prefs.genres.join(', '));
+                    if (prefs.year_from) parts.push(prefs.year_from + '–' + prefs.year_to);
+                    if (prefs.min_rating) parts.push('рейтинг ' + prefs.min_rating + '+');
+                    if (prefs.certification) {
+                        const cm = { 'G': '0+', 'PG': 'PG', 'PG-13': '13+', 'R': '17+', 'NC-17': '18+' };
+                        const labels = prefs.certification.split(',')
+                            .map(c => cm[c.trim()] || c.trim()).join(', ');
+                        parts.push('возраст ' + labels);
+                    }
+                    return parts.length ? 'По критериям: ' + parts.join(' · ') : 'Топ фильмы по вашим вкусам';
+                } catch (e) {
+                    return 'Топ фильмы по вашим вкусам';
+                }
+            }
+
+            let currentOffset = 0;
+
+            async function refreshRecs() {
+                currentOffset += 100;
+                sessionStorage.removeItem('recs_cache');
+                await fetchRecommendations(`/api/recommendations?n=100&offset=${currentOffset}`);
+            }
+
         function certLabel(cert) {
             const map = { 'G': '0+', 'PG': 'PG', 'PG-13': '13+', 'R': '17+', 'NC-17': '18+', 'NR': 'NR', 'TV-MA': '17+' };
             return map[cert] || cert;
         }
 
         function sortMovies(by) {
-            const sorted = [...allMovies];
-            if (by === 'rating') sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-            else if (by === 'year') sorted.sort((a, b) => (b.release_year || 0) - (a.release_year || 0));
-            else if (by === 'year_asc') sorted.sort((a, b) => (a.release_year || 0) - (b.release_year || 0));
-            // default — оставляем порядок сервера (по релевантности)
-            renderMovies(sorted);
-        }
+                if (by === 'default') {
+                    renderMovies(allMovies);
+                    return;
+                }
+                const sorted = [...allMovies];
+                if (by === 'rating') sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                else if (by === 'year') sorted.sort((a, b) => (b.release_year || 0) - (a.release_year || 0));
+                else if (by === 'year_asc') sorted.sort((a, b) => (a.release_year || 0) - (b.release_year || 0));
+                renderMovies(sorted);
+            }
 
         function renderMovies(movies) {
             const grid = document.getElementById('movies-grid');

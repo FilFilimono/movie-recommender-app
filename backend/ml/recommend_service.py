@@ -14,39 +14,32 @@ class RecommendationService:
         self._movie_ids: list[int] = self._metadata.get_all_movie_ids()
         print(f"[RecommendService] Индекс: {len(self._movie_ids)} фильмов")
 
-    def get_for_user(self, user_id: int, n: int = 50) -> list[Movie]:
-        prefs = self._prefs_repo.get_by_user_id(user_id)
-        if prefs is None:
-            return []
-
+    def get_for_user(self, user_id: int, n: int = 100, offset: int = 0) -> list[Movie]:
+        prefs    = self._prefs_repo.get_by_user_id(user_id)
+        if prefs is None: return []
         criteria = prefs.to_criteria_dict()
-        print(f"[SERVICE] criteria: {criteria}")  
-        raw = self._engine.recommend(criteria, n=1500)
+
+        raw = self._engine.recommend(criteria, n=1000)
 
         movies = []
         for item in raw:
             matrix_idx = item["matrix_index"]
-            similarity  = item["similarity"]
-
-            if matrix_idx >= len(self._movie_ids):
-                continue
+            if matrix_idx >= len(self._movie_ids): continue
             movie_id = int(self._movie_ids[matrix_idx])
             data = self._metadata.get_by_id(movie_id)
-            if data is None:
-                continue
-            if not self._passes_filters(data, criteria):
-                continue
+            if data is None: continue
+            if not self._passes_filters(data, criteria): continue
 
-            revenue = float(data.get("revenue")    or 0)
-            votes   = float(data.get("tmdb_votes") or 0)
+            revenue = float(data.get("revenue")     or 0)
+            votes   = float(data.get("tmdb_votes")  or 0)
             rating  = float(data.get("tmdb_rating") or 0)
-            budget  = float(data.get("budget")     or 0)
+            budget  = float(data.get("budget")      or 0)
 
             movies.append({
-                "movie":    Movie(
+                "movie": Movie(
                     movie_id    = movie_id,
                     title       = data.get("title", ""),
-                    similarity  = similarity,
+                    similarity  = item["similarity"],
                     poster_url  = data.get("poster_url"),
                     overview    = data.get("overview"),
                     genres      = data.get("genres", []),
@@ -62,31 +55,33 @@ class RecommendationService:
                 "budget":  budget,
             })
 
-        if not movies:
-            return []
+        if not movies: return []
 
         max_revenue = max(m["revenue"] for m in movies) or 1
         max_votes   = max(m["votes"]   for m in movies) or 1
         max_budget  = max(m["budget"]  for m in movies) or 1
 
         def sort_key(m):
-            revenue_score = m["revenue"] / max_revenue
-            votes_score   = m["votes"]   / max_votes
-            budget_score  = m["budget"]  / max_budget
-            rating_score  = m["rating"]  / 10.0
-            similarity    = m["movie"].similarity
-
-            # Приоритет: жанровое совпадение → сборы → голоса → рейтинг → бюджет
             return (
-                similarity    * 0.40 +
-                revenue_score * 0.25 +
-                votes_score   * 0.20 +
-                rating_score  * 0.10 +
-                budget_score  * 0.05
+                m["movie"].similarity      * 0.40 +
+                (m["revenue"]/max_revenue) * 0.25 +
+                (m["votes"]  /max_votes)   * 0.20 +
+                (m["rating"] /10.0)        * 0.10 +
+                (m["budget"] /max_budget)  * 0.05
             )
 
         movies.sort(key=sort_key, reverse=True)
-        return [m["movie"] for m in movies[:n]]
+
+        # offset позволяет получить следующую "страницу" рекомендаций
+        # При offset=0 — топ 100, при offset=100 — следующие 100
+        all_sorted = [m["movie"] for m in movies]
+        start = offset % max(len(all_sorted), 1)
+        # Берём n фильмов начиная с offset, по кругу
+        result = []
+        for i in range(n):
+            idx = (start + i) % len(all_sorted)
+            result.append(all_sorted[idx])
+        return result
 
     def get_movie_detail(self, movie_id: int) -> dict | None:
         return self._metadata.get_by_id(movie_id)

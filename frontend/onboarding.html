@@ -801,6 +801,8 @@
                     alert(data.detail || 'Ошибка сохранения');
                     return;
                 }
+                sessionStorage.removeItem('recs_cache');      // ← сброс кеша
+                sessionStorage.removeItem('recommendations'); // ← на случай старого ключа
                 window.location.href = '/recommendations.html';
             } catch (e) {
                 alert('Ошибка соединения с сервером');

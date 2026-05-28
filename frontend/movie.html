@@ -420,7 +420,7 @@
 <body>
     <nav>
         <div class="logo">Cine<span>Match</span></div>
-        <a href="/recommendations.html" class="btn-back">← Назад к списку</a>
+        <button class="btn-back" onclick="goBack()">← Назад</button>
     </nav>
 
     <!-- Загрузка -->
@@ -492,6 +492,14 @@
             try { return JSON.parse(val.replace(/'/g, '"')); } catch (e) { }
             return String(val).split(',').map(s => s.trim()).filter(Boolean);
         }
+
+        function goBack() {
+                if (history.length > 1) {
+                    history.back();  
+                } else {
+                    window.location.href = '/recommendations.html';
+                }
+            }
 
         async function loadMovie() {
             try {

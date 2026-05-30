@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineMatch — Ваши предпочтения</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <style>
         *,
@@ -19,73 +19,29 @@
 
         :root {
             --bg: #0a0a0f;
-            --surface: rgba(19, 19, 26, 0.6);
+            --surface: #13131a;
             --surface2: #1c1c27;
             --border: #2a2a3a;
             --accent: #e8b34b;
-            --accent2: #ff6b4a;
+            --accent2: #c97d3f;
             --text: #f0eeea;
             --muted: #6b6b80;
-            --radius: 16px;
+            --radius: 12px
         }
 
         body {
-            background: linear-gradient(135deg, #0a0a0f 0%, #0f0f1a 50%, #0a0a0f 100%);
+            background: var(--bg);
             color: var(--text);
             font-family: 'Manrope', sans-serif;
-            min-height: 100vh;
-            position: relative;
+            min-height: 100vh
         }
 
-        /* Плавающие мягкие блики */
-        .ambient-light {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .ambient-light::before,
-        .ambient-light::after {
+        body::before {
             content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.25;
-            animation: float 25s ease-in-out infinite;
-        }
-
-        .ambient-light::before {
-            background: var(--accent);
-            top: -100px;
-            left: -100px;
-            animation-delay: 0s;
-        }
-
-        .ambient-light::after {
-            background: var(--accent2);
-            bottom: -100px;
-            right: -100px;
-            animation-delay: -12s;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
-
-            33% {
-                transform: translate(50px, -50px) scale(1.2);
-            }
-
-            66% {
-                transform: translate(-30px, 30px) scale(0.9);
-            }
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(232, 179, 75, .06) 0%, transparent 60%);
+            pointer-events: none
         }
 
         nav {
@@ -93,601 +49,422 @@
             align-items: center;
             justify-content: space-between;
             padding: 16px 48px;
-            background: rgba(10, 10, 15, 0.7);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(232, 179, 75, 0.08);
+            background: rgba(10, 10, 15, .9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 100
         }
 
         .logo {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1.6rem;
-            letter-spacing: 0.12em;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            letter-spacing: .1em;
+            color: var(--accent)
         }
 
         .logo span {
-            background: linear-gradient(135deg, var(--text) 0%, var(--muted) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--text)
         }
 
         .nav-user {
-            font-size: 0.85rem;
-            background: linear-gradient(135deg, rgba(232, 179, 75, 0.12), rgba(255, 107, 74, 0.08));
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(232, 179, 75, 0.15);
-            backdrop-filter: blur(10px);
+            font-size: .82rem;
+            color: var(--muted)
         }
 
         .container {
-            max-width: 850px;
+            max-width: 780px;
             margin: 0 auto;
-            padding: 60px 24px 100px;
-            position: relative;
-            z-index: 2;
+            padding: 60px 24px 100px
         }
 
-        /* Прогресс-бар */
         .progress-wrap {
-            margin-bottom: 56px;
+            margin-bottom: 48px
         }
 
         .progress-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 12px;
+            align-items: center;
+            margin-bottom: 12px
         }
 
         .progress-label {
-            font-size: 0.75rem;
+            font-size: .78rem;
             color: var(--muted);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase
         }
 
         .progress-count {
-            font-size: 0.8rem;
+            font-size: .78rem;
             color: var(--accent);
-            font-weight: 700;
-            background: rgba(232, 179, 75, 0.1);
-            padding: 4px 10px;
-            border-radius: 20px;
+            font-weight: 600
         }
 
         .progress-bar {
-            height: 4px;
-            background: rgba(42, 42, 58, 0.5);
-            border-radius: 10px;
-            overflow: hidden;
+            height: 3px;
+            background: var(--surface2);
+            border-radius: 2px;
+            overflow: hidden
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            border-radius: 10px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width .5s cubic-bezier(.4, 0, .2, 1)
         }
 
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        /* Шаги */
         .step {
             display: none;
-            animation: stepIn 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+            animation: stepIn .4s ease both
         }
 
         .step.active {
-            display: block;
+            display: block
         }
 
         @keyframes stepIn {
             from {
                 opacity: 0;
-                transform: translateX(30px);
+                transform: translateX(20px)
             }
 
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateX(0)
             }
         }
 
         .step-eyebrow {
-            font-size: 0.7rem;
+            font-size: .72rem;
             color: var(--accent);
-            letter-spacing: 0.2em;
+            letter-spacing: .15em;
             text-transform: uppercase;
             font-weight: 600;
-            margin-bottom: 12px;
-            opacity: 0.8;
+            margin-bottom: 10px
         }
 
         .step-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 3.2rem;
+            font-size: 3rem;
             line-height: 1;
-            letter-spacing: 0.04em;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, var(--text), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            letter-spacing: .04em;
+            margin-bottom: 8px
         }
 
         .step-desc {
-            font-size: 0.9rem;
+            font-size: .9rem;
             color: var(--muted);
             line-height: 1.6;
-            margin-bottom: 36px;
-            max-width: 550px;
+            margin-bottom: 32px;
+            max-width: 500px
         }
 
         /* Жанры */
         .genre-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 12px;
-            margin-bottom: 48px;
+            gap: 10px;
+            margin-bottom: 40px
         }
 
         .genre-card {
             padding: 16px 12px;
-            border: 1px solid rgba(232, 179, 75, 0.1);
-            border-radius: 14px;
-            background: rgba(19, 19, 26, 0.5);
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all .18s;
             text-align: center;
-            user-select: none;
+            user-select: none
         }
 
         .genre-card:hover {
-            border-color: rgba(232, 179, 75, 0.4);
-            background: rgba(19, 19, 26, 0.7);
-            transform: translateY(-2px);
+            border-color: var(--accent);
+            background: var(--surface2)
         }
 
         .genre-card.selected {
             border-color: var(--accent);
-            background: linear-gradient(135deg, rgba(232, 179, 75, 0.12), rgba(255, 107, 74, 0.06));
-            box-shadow: 0 0 15px rgba(232, 179, 75, 0.15);
+            background: rgba(232, 179, 75, .1)
         }
 
         .genre-icon {
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            display: block
         }
 
         .genre-name {
-            font-size: 0.75rem;
-            font-weight: 500;
+            font-size: .78rem;
+            font-weight: 500
         }
 
         /* Слайдеры */
         .range-wrap {
-            margin-bottom: 48px;
+            margin-bottom: 40px
         }
 
         .range-display {
             text-align: center;
             font-family: 'Bebas Neue', sans-serif;
             font-size: 3.5rem;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: 0.06em;
-            margin-bottom: 24px;
-        }
-
-        .range-label {
-            font-size: 0.75rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            display: block;
-            margin-bottom: 10px;
+            color: var(--accent);
+            letter-spacing: .06em;
+            margin-bottom: 16px
         }
 
         input[type=range] {
             width: 100%;
-            -webkit-appearance: none;
             appearance: none;
             height: 4px;
-            background: rgba(42, 42, 58, 0.5);
-            border-radius: 10px;
+            background: var(--surface2);
+            border-radius: 2px;
             outline: none;
-            margin-bottom: 20px;
+            margin-bottom: 16px
         }
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 20px;
             height: 20px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            background: var(--accent);
             border-radius: 50%;
             cursor: pointer;
             border: 3px solid var(--bg);
-            box-shadow: 0 0 0 2px var(--accent);
-            transition: transform 0.2s ease;
-        }
-
-        input[type=range]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
+            box-shadow: 0 0 0 1px var(--accent)
         }
 
         .range-labels {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--muted);
+            font-size: .78rem;
+            color: var(--muted)
         }
 
-        /* Звезды рейтинга */
+        /* Рейтинг */
         .stars {
             display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px
         }
 
         .star {
-            width: 52px;
-            height: 52px;
-            border: 1px solid rgba(232, 179, 75, 0.2);
-            border-radius: 14px;
-            background: rgba(19, 19, 26, 0.5);
-            backdrop-filter: blur(10px);
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.34, 1.2, 0.64, 1);
-        }
-
-        .star:hover {
-            transform: scale(1.05);
-            border-color: rgba(232, 179, 75, 0.5);
+            transition: all .15s
         }
 
         .star.lit {
-            background: linear-gradient(135deg, rgba(232, 179, 75, 0.15), rgba(255, 107, 74, 0.08));
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: scale(1.02);
+            background: rgba(232, 179, 75, .15);
+            border-color: var(--accent)
         }
 
         .rating-label {
-            font-size: 0.85rem;
-            color: var(--muted);
+            font-size: .85rem;
+            color: var(--muted)
         }
 
         .rating-label span {
             color: var(--accent);
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 600
         }
 
         /* Возрастной рейтинг */
         .cert-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 14px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 40px
         }
 
         .cert-card {
             padding: 18px 16px;
-            border: 1px solid rgba(232, 179, 75, 0.1);
-            border-radius: 16px;
-            background: rgba(19, 19, 26, 0.5);
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all .18s;
             user-select: none;
-            position: relative;
+            position: relative
         }
 
         .cert-card:hover {
-            border-color: rgba(232, 179, 75, 0.4);
-            background: rgba(19, 19, 26, 0.7);
-            transform: translateY(-2px);
+            border-color: var(--accent);
+            background: var(--surface2)
         }
 
         .cert-card.selected {
             border-color: var(--accent);
-            background: linear-gradient(135deg, rgba(232, 179, 75, 0.1), rgba(255, 107, 74, 0.05));
-            box-shadow: 0 0 15px rgba(232, 179, 75, 0.1);
+            background: rgba(232, 179, 75, .08)
         }
 
         .cert-card.selected::after {
             content: '✓';
             position: absolute;
-            top: 12px;
-            right: 14px;
+            top: 10px;
+            right: 12px;
             color: var(--accent);
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: .85rem;
+            font-weight: 600
         }
 
         .cert-badge {
             display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: .85rem;
             font-weight: 700;
-            margin-bottom: 10px;
-            letter-spacing: 0.04em;
+            margin-bottom: 8px;
+            letter-spacing: .04em
         }
 
         .cert-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text);
+            font-size: .88rem;
+            font-weight: 500;
+            margin-bottom: 4px
         }
 
         .cert-desc {
-            font-size: 0.7rem;
+            font-size: .75rem;
             color: var(--muted);
-            line-height: 1.4;
+            line-height: 1.4
         }
 
         .cert-count {
-            font-size: 0.65rem;
+            font-size: .68rem;
             color: var(--muted);
-            margin-top: 8px;
-            opacity: 0.7;
+            margin-top: 6px
         }
 
-        /* Цвета для возрастных рейтингов */
+        /* any-rating card */
         .cert-card.any .cert-badge {
-            background: rgba(107, 107, 128, 0.2);
-            color: var(--muted);
+            background: var(--surface2);
+            color: var(--text)
         }
 
         .cert-card.g .cert-badge {
-            background: linear-gradient(135deg, rgba(123, 198, 126, 0.15), rgba(123, 198, 126, 0.08));
-            color: #7bc67e;
+            background: rgba(123, 198, 126, .15);
+            color: #7bc67e
         }
 
         .cert-card.pg .cert-badge {
-            background: linear-gradient(135deg, rgba(107, 159, 212, 0.15), rgba(107, 159, 212, 0.08));
-            color: #6b9fd4;
+            background: rgba(107, 159, 212, .15);
+            color: #6b9fd4
         }
 
         .cert-card.pg13 .cert-badge {
-            background: linear-gradient(135deg, rgba(232, 179, 75, 0.15), rgba(232, 179, 75, 0.08));
-            color: var(--accent);
+            background: rgba(232, 179, 75, .15);
+            color: #e8b34b
         }
 
         .cert-card.r .cert-badge {
-            background: linear-gradient(135deg, rgba(224, 130, 82, 0.15), rgba(224, 130, 82, 0.08));
-            color: #e08252;
+            background: rgba(224, 130, 82, .15);
+            color: #e08252
         }
 
         .cert-card.nc17 .cert-badge {
-            background: linear-gradient(135deg, rgba(224, 82, 82, 0.15), rgba(224, 82, 82, 0.08));
-            color: var(--danger);
+            background: rgba(224, 82, 82, .15);
+            color: #e05252
         }
 
-        /* Инфо-бокс */
-        .info-box {
-            padding: 16px 20px;
-            background: linear-gradient(135deg, rgba(232, 179, 75, 0.05), rgba(255, 107, 74, 0.02));
-            border: 1px solid rgba(232, 179, 75, 0.12);
-            border-radius: 16px;
-            margin-bottom: 32px;
-        }
-
-        .info-box p {
-            font-size: 0.78rem;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .info-box strong {
-            color: var(--accent);
-        }
-
-        /* Навигация между шагами */
+        /* Навигация */
         .step-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(232, 179, 75, 0.08);
+            margin-top: 8px
         }
 
         .btn-back {
-            padding: 12px 28px;
-            border: 1px solid rgba(232, 179, 75, 0.2);
-            border-radius: 40px;
-            background: rgba(19, 19, 26, 0.5);
-            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: transparent;
             color: var(--muted);
             font-family: 'Manrope', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-size: .85rem;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all .2s
         }
 
         .btn-back:hover {
             border-color: var(--text);
-            color: var(--text);
-            transform: translateX(-2px);
+            color: var(--text)
         }
 
         .btn-next {
-            padding: 13px 34px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            padding: 13px 32px;
+            background: var(--accent);
             border: none;
-            border-radius: 40px;
+            border-radius: var(--radius);
             color: #0a0a0f;
             font-family: 'Manrope', sans-serif;
-            font-size: 0.85rem;
+            font-size: .88rem;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: .05em;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all .2s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 8px
         }
 
         .btn-next:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(232, 179, 75, 0.3);
+            background: var(--accent2);
+            transform: translateY(-1px)
         }
 
         .btn-next:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+            opacity: .6;
+            cursor: not-allowed
         }
 
         .skip-btn {
-            font-size: 0.78rem;
+            font-size: .78rem;
             color: var(--muted);
             cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
             background: none;
             border: none;
-            font-family: 'Manrope', sans-serif;
-            padding: 8px 16px;
-            border-radius: 40px;
-            transition: all 0.2s ease;
+            font-family: 'Manrope', sans-serif
         }
 
         .skip-btn:hover {
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--text)
         }
 
         .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(0, 0, 0, 0.2);
-            border-top-color: #0a0a0f;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, .3);
+            border-top-color: #000;
             border-radius: 50%;
-            animation: spin 0.6s linear infinite;
+            animation: spin .6s linear infinite
         }
 
         @keyframes spin {
             to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Кастомный скроллбар */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(42, 42, 58, 0.3);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            nav {
-                padding: 12px 20px;
-            }
-
-            .container {
-                padding: 32px 20px 60px;
-            }
-
-            .step-title {
-                font-size: 2.2rem;
-            }
-
-            .genre-grid {
-                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-                gap: 8px;
-            }
-
-            .cert-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stars {
-                gap: 8px;
-            }
-
-            .star {
-                width: 44px;
-                height: 44px;
-                font-size: 1.3rem;
-            }
-
-            .step-nav {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .step-nav button {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .btn-back {
-                order: 2;
-            }
-
-            .btn-next,
-            .skip-btn {
-                order: 1;
+                transform: rotate(360deg)
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="ambient-light"></div>
-
     <nav>
         <div class="logo">Cine<span>Match</span></div>
         <div class="nav-user" id="nav-username"></div>
@@ -708,7 +485,7 @@
         <div class="step active" id="step-1">
             <div class="step-eyebrow">Шаг 1</div>
             <div class="step-title">Любимые жанры</div>
-            <div class="step-desc">Выберите всё, что вам нравится — можно несколько.</div>
+            <div class="step-desc">Выберите всё что вам нравится — можно несколько.</div>
             <div class="genre-grid">
                 <div class="genre-card" data-genre="Action" onclick="toggleGenre(this)"><span
                         class="genre-icon">⚡</span>
@@ -798,11 +575,15 @@
             <div class="step-desc">За какие годы вас интересуют фильмы?</div>
             <div class="range-wrap">
                 <div class="range-display" id="year-display">2000 — 2024</div>
-                <div class="range-label">От года</div>
+                <label
+                    style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:8px">От
+                    года</label>
                 <input type="range" id="year-from" min="1970" max="2024" value="2000" oninput="updateYears()">
-                <div class="range-label">До года</div>
+                <label
+                    style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:8px">До
+                    года</label>
                 <input type="range" id="year-to" min="1970" max="2024" value="2024" oninput="updateYears()">
-                <div class="range-labels"><span>1970</span><span>1990</span><span>2010</span><span>2024</span></div>
+                <div class="range-labels"><span>1970</span><span>2024</span></div>
             </div>
             <div class="step-nav">
                 <button class="btn-back" onclick="prevStep()">← Назад</button>
@@ -819,10 +600,10 @@
             <div class="step-title">Минимальный рейтинг</div>
             <div class="step-desc">
                 Ниже какого рейтинга фильмы вам не интересны?
-                <span style="color:var(--accent);font-weight:500"> Рекомендуем 7.0+</span> —
-                выше рейтинг — качественнее фильмы.
+                <span style="color:var(--accent);font-weight:500"> Рекомендуем выбрать 7.0+</span> —
+                выше рейтинг, меньше фильмов, но все они качественные.
             </div>
-            <div style="margin-bottom:48px">
+            <div style="margin-bottom:40px">
                 <div class="stars" id="stars">
                     <div class="star" data-val="2" onclick="setRating(2)">★</div>
                     <div class="star" data-val="4" onclick="setRating(4)">★</div>
@@ -843,17 +624,18 @@
             </div>
         </div>
 
-        <!-- ШАГ 4: Возрастной рейтинг -->
+        <!-- ШАГ 4: Возрастной рейтинг (НОВЫЙ) -->
         <div class="step" id="step-4">
             <div class="step-eyebrow">Шаг 4</div>
             <div class="step-title">Возрастной рейтинг</div>
             <div class="step-desc">
                 Выберите один или несколько подходящих рейтингов.
-                <span style="color:var(--accent);font-weight:500"> Рекомендуем «Без ограничений»</span> —
+                <span style="color:var(--accent);font-weight:500"> Рекомендуем оставить «Без ограничений»</span> —
                 так вы увидите больше фильмов.
             </div>
 
             <div class="cert-grid">
+
                 <div class="cert-card any selected" data-cert="any" onclick="toggleCert(this)">
                     <span class="cert-badge">Все</span>
                     <div class="cert-name">Без ограничений</div>
@@ -895,12 +677,17 @@
                     <div class="cert-desc">Только для взрослых, жёсткий контент</div>
                     <div class="cert-count">≈ 194 фильмов</div>
                 </div>
+
             </div>
 
-            <div class="info-box">
-                <p>ℹ️ У многих фильмов возрастной рейтинг не указан (≈ 10 589 фильмов). При выборе конкретного рейтинга
+            <div
+                style="padding:14px 16px;background:rgba(232,179,75,.05);border:1px solid rgba(232,179,75,.15);border-radius:var(--radius);margin-bottom:32px">
+                <div style="font-size:.78rem;color:var(--muted);line-height:1.6">
+                    ℹ️ У многих фильмов возрастной рейтинг не указан (≈ 10 589 фильмов). При выборе конкретного рейтинга
                     они будут исключены.
-                    Если хотите видеть больше фильмов — выберите <strong>Без ограничений</strong>.</p>
+                    Если хотите видеть больше фильмов — выберите <strong style="color:var(--text)">Без
+                        ограничений</strong>.
+                </div>
             </div>
 
             <div class="step-nav">
@@ -910,6 +697,7 @@
                 </button>
             </div>
         </div>
+
     </div>
 
     <script>
@@ -928,7 +716,7 @@
             keywords: [], certification: ''
         };
 
-        let selectedCerts = [];
+        let selectedCerts = []; 
 
         function goToStep(n) {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
@@ -963,6 +751,7 @@
                 s.classList.toggle('lit', +s.dataset.val <= val));
             document.getElementById('rating-val').textContent = val + '.0+';
         }
+
 
         function toggleCert(el) {
             const cert = el.dataset.cert;
@@ -1012,8 +801,8 @@
                     alert(data.detail || 'Ошибка сохранения');
                     return;
                 }
-                sessionStorage.removeItem('recs_cache');
-                sessionStorage.removeItem('recommendations');
+                sessionStorage.removeItem('recs_cache');      // ← сброс кеша
+                sessionStorage.removeItem('recommendations'); // ← на случай старого ключа
                 window.location.href = '/recommendations.html';
             } catch (e) {
                 alert('Ошибка соединения с сервером');

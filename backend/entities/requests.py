@@ -12,7 +12,7 @@ class PreferencesRequest(BaseModel):
     genres: list[str]  = []
     cast: list[str]  = []
     director: str= ""
-    year_from: int= 1970
+    year_from: int= 2000
     year_to: int= 2024
     min_rating: float|None = None
     max_runtime: int= 240

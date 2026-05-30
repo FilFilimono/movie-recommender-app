@@ -29,7 +29,7 @@ class UserPreferences:
         genres=None,
         cast=None,
         director="",
-        year_from=1970,
+        year_from=2000,
         year_to=2024,
         min_rating=None,
         max_runtime=240,

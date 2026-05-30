@@ -70,7 +70,7 @@ class PreferencesRepository:
             genres=d.get("genres") or [],
             cast=d.get("cast") or [],
             director=d.get("director", ""),
-            year_from=d.get("year_from", 1970),
+            year_from=d.get("year_from", 2000),
             year_to=d.get("year_to", 2024),
             min_rating=d.get("min_rating"),
             max_runtime=d.get("max_runtime", 240),

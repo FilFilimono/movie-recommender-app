@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch — Моё кино</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1c1c27;
+            --border: #2a2a3a;
+            --accent: #e8b34b;
+            --accent2: #c97d3f;
+            --text: #f0eeea;
+            --muted: #6b6b80;
+            --danger: #e05252;
+            --radius: 12px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            min-height: 100vh
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 0%, rgba(232, 179, 75, .06) 0%, transparent 55%),
+                radial-gradient(ellipse 60% 60% at 90% 80%, rgba(180, 80, 220, .04) 0%, transparent 55%);
+        }
+
+        /* ── NAV ── */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 40px;
+            background: rgba(10, 10, 15, .92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: .1em;
+            color: var(--accent);
+            text-decoration: none
+        }
+
+        .logo span {
+            color: var(--text)
+        }
+
+        .nav-r {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .nav-btn {
+            padding: 7px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: .75rem;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        .nav-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(232, 179, 75, .08)
+        }
+
+        .nav-btn.danger:hover {
+            border-color: var(--danger);
+            color: var(--danger)
+        }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 52px 40px 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* .hero-left {} */
+
+        .hero-eyebrow {
+            font-size: .7rem;
+            color: var(--accent);
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px
+        }
+
+        .hero-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 5rem;
+            line-height: .9;
+            letter-spacing: .04em;
+            margin-bottom: 12px
+        }
+
+        .hero-title em {
+            font-style: normal;
+            -webkit-text-stroke: 1.5px var(--accent);
+            color: transparent
+        }
+
+        .hero-sub {
+            font-size: .88rem;
+            color: var(--muted);
+            line-height: 1.6;
+            max-width: 400px
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 24px;
+            flex-shrink: 0;
+            padding-bottom: 4px
+        }
+
+        .stat-box {
+            text-align: center
+        }
+
+        .stat-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.8rem;
+            color: var(--accent);
+            line-height: 1
+        }
+
+        .stat-lbl {
+            font-size: .7rem;
+            color: var(--muted);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-top: 2px
+        }
+
+        /* ── КОНТЕЙНЕР ── */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px 24px 80px
+        }
+
+        /* ── СЕКЦИЯ-ЗАГОЛОВОК ── */
+        .sec-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 6px
+        }
+
+        .sec-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: .04em
+        }
+
+        .sec-badge {
+            font-size: .72rem;
+            padding: 3px 9px;
+            border-radius: 10px;
+            font-weight: 600
+        }
+
+        .badge-liked {
+            background: rgba(224, 82, 82, .12);
+            color: #e05252;
+            border: 1px solid rgba(224, 82, 82, .25)
+        }
+
+        .badge-similar {
+            background: rgba(232, 179, 75, .12);
+            color: var(--accent);
+            border: 1px solid rgba(232, 179, 75, .25)
+        }
+
+        .sec-desc {
+            font-size: .82rem;
+            color: var(--muted);
+            margin-bottom: 20px;
+            line-height: 1.5
+        }
+
+        /* ── ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ ── */
+        .hscroll-wrap {
+            position: relative;
+            margin-bottom: 48px
+        }
+
+        .hscroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .hscroll::-webkit-scrollbar {
+            height: 3px
+        }
+
+        .hscroll::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px
+        }
+
+        /* Карточка лайкнутого фильма */
+        .fav-card {
+            flex-shrink: 0;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .fav-poster {
+            width: 120px;
+            height: 180px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            position: relative;
+            transition: all .22s;
+        }
+
+        .fav-card:hover .fav-poster {
+            border-color: rgba(232, 75, 75, .5);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, .5);
+        }
+
+        .fav-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block
+        }
+
+        .fav-poster-ph {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--border)
+        }
+
+        /* Оверлей кнопки убрать */
+        .fav-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, .9) 0%, rgba(0, 0, 0, .2) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity .2s;
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .fav-card:hover .fav-overlay {
+            opacity: 1
+        }
+
+        .fav-remove {
+            width: 100%;
+            padding: 5px 0;
+            background: rgba(224, 82, 82, .85);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-family: 'Manrope', sans-serif;
+            font-size: .65rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s;
+            letter-spacing: .02em;
+        }
+
+        .fav-remove:hover {
+            background: var(--danger)
+        }
+
+        .fav-title {
+            font-size: .68rem;
+            font-weight: 500;
+            margin-top: 7px;
+            line-height: 1.3;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fav-rating {
+            font-size: .64rem;
+            color: var(--accent);
+            margin-top: 2px
+        }
+
+        /* ── ПУСТОЕ СОСТОЯНИЕ ── */
+        .empty-fav {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            padding: 28px 32px;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 48px;
+        }
+
+        .empty-fav-icon {
+            font-size: 3rem;
+            flex-shrink: 0
+        }
+
+        .empty-fav-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 6px
+        }
+
+        .empty-fav-desc {
+            font-size: .82rem;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 14px
+        }
+
+        .btn-go {
+            display: inline-block;
+            padding: 9px 20px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: #0a0a0f;
+            font-family: 'Manrope', sans-serif;
+            font-size: .78rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            transition: all .2s
+        }
+
+        .btn-go:hover {
+            background: var(--accent2);
+            transform: translateY(-1px)
+        }
+
+        /* ── РАЗДЕЛИТЕЛЬ ── */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 36px;
+            padding: 0 2px;
+        }
+
+        .div-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border), transparent)
+        }
+
+        .div-text {
+            font-size: .7rem;
+            color: var(--muted);
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            white-space: nowrap
+        }
+
+        /* ── СЕТКА ПОХОЖИХ ── */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 16px;
+        }
+
+        .movie-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .movie-card:hover {
+            border-color: rgba(232, 179, 75, .4);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 36px rgba(0, 0, 0, .45)
+        }
+
+        .poster {
+            aspect-ratio: 2/3;
+            background: var(--surface2);
+            position: relative;
+            overflow: hidden
+        }
+
+        .poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform .3s
+        }
+
+        .movie-card:hover .poster img {
+            transform: scale(1.05)
+        }
+
+        .poster-ph {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--border)
+        }
+
+        .score-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(10, 10, 15, .85);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(232, 179, 75, .3);
+            border-radius: 6px;
+            padding: 3px 7px;
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--accent)
+        }
+
+        .card-body {
+            padding: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px
+        }
+
+        .card-title {
+            font-size: .82rem;
+            font-weight: 600;
+            line-height: 1.3
+        }
+
+        .card-meta {
+            font-size: .7rem;
+            color: var(--muted);
+            display: flex;
+            gap: 6px;
+            align-items: center
+        }
+
+        .card-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--border)
+        }
+
+        .card-genres {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+            margin-top: 3px
+        }
+
+        .g-tag {
+            font-size: .62rem;
+            padding: 2px 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--muted)
+        }
+
+        .match-label {
+            font-size: .65rem;
+            font-weight: 600;
+            margin-top: 7px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            display: inline-block
+        }
+
+        .ml-great {
+            background: rgba(232, 179, 75, .12);
+            color: #e8b34b;
+            border: 1px solid rgba(232, 179, 75, .25)
+        }
+
+        .ml-good {
+            background: rgba(123, 198, 126, .1);
+            color: #7bc67e;
+            border: 1px solid rgba(123, 198, 126, .25)
+        }
+
+        .ml-ok {
+            background: rgba(107, 107, 128, .1);
+            color: #9b9bb0;
+            border: 1px solid rgba(107, 107, 128, .2)
+        }
+
+        /* Скелетон */
+        .sk-fav {
+            flex-shrink: 0;
+            width: 120px
+        }
+
+        .sk-poster {
+            width: 120px;
+            height: 180px;
+            border-radius: 10px;
+            background: var(--surface2);
+            animation: sh 1.5s infinite
+        }
+
+        .sk-line {
+            height: 9px;
+            border-radius: 3px;
+            background: var(--surface2);
+            animation: sh 1.5s infinite;
+            margin-top: 7px;
+            width: 75%;
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .sk-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden
+        }
+
+        .sk-card-poster {
+            aspect-ratio: 2/3;
+            background: var(--surface2);
+            animation: sh 1.5s infinite
+        }
+
+        .sk-card-body {
+            padding: 10px
+        }
+
+        .sk-card-line {
+            height: 10px;
+            border-radius: 3px;
+            background: var(--surface2);
+            animation: sh 1.5s infinite;
+            margin-bottom: 6px
+        }
+
+        .sk-card-line.s {
+            width: 55%
+        }
+
+        @keyframes sh {
+
+            0%,
+            100% {
+                opacity: .4
+            }
+
+            50% {
+                opacity: .8
+            }
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="/recommendations.html" class="logo">Cine<span>Match</span></a>
+        <div class="nav-r">
+            <span style="font-size:.78rem;color:var(--muted)" id="nav-user"></span>
+            <a href="/recommendations.html" class="nav-btn">★ Рекомендации</a>
+            <a href="/search.html" class="nav-btn">🔍 Поиск</a>
+            <a href="/favorites.html" class="nav-btn active">🎬 Моё кино</a>
+            <button class="nav-btn danger" onclick="logout()">Выйти</button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-left">
+            <div class="hero-eyebrow">Личная коллекция</div>
+            <div class="hero-title">Моё <em>Кино</em></div>
+            <div class="hero-sub">Ваши любимые фильмы и персональные рекомендации на их основе</div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-box">
+                <div class="stat-num" id="stat-liked">—</div>
+                <div class="stat-lbl">В избранном</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="stat-rec">—</div>
+                <div class="stat-lbl">Рекомендаций</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- ИЗБРАННОЕ -->
+        <div class="sec-head">
+            <div class="sec-title">❤ Избранное</div>
+            <span class="sec-badge badge-liked" id="liked-badge" style="display:none"></span>
+        </div>
+        <div class="sec-desc">Наведите на постер чтобы убрать фильм из избранного</div>
+        <div id="liked-section"></div>
+
+        <!-- РАЗДЕЛИТЕЛЬ (скрыт пока нет лайков) -->
+        <div class="divider" id="divider" style="display:none">
+            <div class="div-line"></div>
+            <div class="div-text">✦ потому что вам понравилось ✦</div>
+            <div class="div-line"></div>
+        </div>
+
+        <!-- ПОХОЖИЕ -->
+        <div id="similar-section" style="display:none">
+            <div class="sec-head">
+                <div class="sec-title">Вам также понравится</div>
+                <span class="sec-badge badge-similar">На основе вашего вкуса</span>
+            </div>
+            <div class="sec-desc" id="similar-desc"></div>
+            <div id="similar-grid" class="movies-grid"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/index.html';
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('nav-user').textContent = 'Привет, ' + (user.username || '');
+
+        let likedIds = [];
+        let likedMovies = [];
+
+        async function logout() {
+            try { await fetch('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } }); }
+            finally { localStorage.clear(); window.location.href = '/index.html'; }
+        }
+
+        function parseList(v) {
+            if (!v) return [];
+            if (Array.isArray(v)) return v;
+            try { return JSON.parse(v.replace(/'/g, '"')); } catch (e) { }
+            return String(v).split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        function plural(n) {
+            if (n % 100 >= 11 && n % 100 <= 19) return 'фильмов';
+            if (n % 10 === 1) return 'фильм';
+            if (n % 10 >= 2 && n % 10 <= 4) return 'фильма';
+            return 'фильмов';
+        }
+
+        function matchLabel(sim) {
+            if (sim >= 0.15) return { t: '✦ Отличное совпадение', c: 'ml-great' };
+            if (sim >= 0.08) return { t: '✓ Хорошее совпадение', c: 'ml-good' };
+            return { t: '◌ Возможно понравится', c: 'ml-ok' };
+        }
+
+        // ── Главная загрузка ──
+        async function init() {
+            showLikedSkeletons();
+
+            try {
+                const r = await fetch('/api/likes', { headers: { 'Authorization': 'Bearer ' + token } });
+                if (!r.ok) throw new Error();
+                const data = await r.json();
+                likedIds = data.movie_ids || [];
+
+                // Обновляем статистику
+                document.getElementById('stat-liked').textContent = likedIds.length;
+
+                if (!likedIds.length) {
+                    renderEmptyLikes();
+                    return;
+                }
+
+                // Показываем badge
+                const badge = document.getElementById('liked-badge');
+                badge.textContent = likedIds.length + ' ' + plural(likedIds.length);
+                badge.style.display = 'inline-block';
+
+                // Загружаем данные фильмов параллельно
+                const results = await Promise.allSettled(
+                    likedIds.map(id =>
+                        fetch(`/api/movie/${id}`).then(r => r.ok ? r.json() : null)
+                    )
+                );
+                likedMovies = results
+                    .filter(r => r.status === 'fulfilled' && r.value)
+                    .map(r => r.value);
+
+                renderLikedScroll(likedMovies);
+                loadSimilar();
+
+            } catch (e) {
+                document.getElementById('liked-section').innerHTML =
+                    '<div style="color:var(--muted);padding:40px;text-align:center">Ошибка загрузки</div>';
+            }
+        }
+
+        function showLikedSkeletons() {
+            document.getElementById('liked-section').innerHTML = `
+    <div class="hscroll-wrap">
+      <div class="hscroll">
+        ${Array(8).fill(0).map(() => `
+          <div class="sk-fav">
+            <div class="sk-poster"></div>
+            <div class="sk-line"></div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+        }
+
+        function renderEmptyLikes() {
+            document.getElementById('liked-section').innerHTML = `
+    <div class="empty-fav">
+      <div class="empty-fav-icon">🎬</div>
+      <div>
+        <div class="empty-fav-title">Здесь пока ничего нет</div>
+        <div class="empty-fav-desc">
+          Нажмите ♡ на карточке любого фильма — он появится здесь.
+          Чем больше фильмов вы добавите, тем точнее будут рекомендации.
+        </div>
+        <a href="/recommendations.html" class="btn-go">Смотреть рекомендации</a>
+      </div>
+    </div>`;
+        }
+
+        function renderLikedScroll(movies) {
+            document.getElementById('liked-section').innerHTML = `
+    <div class="hscroll-wrap">
+      <div class="hscroll">
+        ${movies.map(m => {
+                const rating = m.tmdb_rating ? Number(m.tmdb_rating).toFixed(1) : null;
+                return `
+          <div class="fav-card">
+            <a href="/movie.html?id=${m.movie_id}" style="display:block">
+              <div class="fav-poster">
+                ${m.poster_url
+                        ? `<img src="${m.poster_url}" alt="${m.title || ''}" loading="lazy"
+                          onerror="this.parentElement.innerHTML='<div class=fav-poster-ph>🎬</div>'">`
+                        : `<div class="fav-poster-ph">🎬</div>`}
+                <div class="fav-overlay">
+                  <button class="fav-remove"
+                    onclick="event.preventDefault();event.stopPropagation();removeLike(${m.movie_id},this)">
+                    ✕ Убрать
+                  </button>
+                </div>
+              </div>
+            </a>
+            <div class="fav-title" title="${m.title || ''}">${m.title || '—'}</div>
+            ${rating ? `<div class="fav-rating">★ ${rating}</div>` : ''}
+          </div>`;
+            }).join('')}
+      </div>
+    </div>`;
+        }
+
+        async function removeLike(movieId, btn) {
+            const card = btn.closest('.fav-card');
+            card.style.transition = 'all .25s';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(.85)';
+            try {
+                await fetch(`/api/like/${movieId}`, {
+                    method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+                });
+            } catch (e) { }
+            setTimeout(() => {
+                likedIds = likedIds.filter(id => id !== movieId);
+                likedMovies = likedMovies.filter(m => m.movie_id !== movieId);
+                document.getElementById('stat-liked').textContent = likedIds.length;
+                if (!likedIds.length) {
+                    renderEmptyLikes();
+                    document.getElementById('divider').style.display = 'none';
+                    document.getElementById('similar-section').style.display = 'none';
+                } else {
+                    renderLikedScroll(likedMovies);
+                }
+            }, 260);
+        }
+
+        // ── Загрузка похожих ──
+        async function loadSimilar() {
+            const section = document.getElementById('similar-section');
+            const divider = document.getElementById('divider');
+            const grid = document.getElementById('similar-grid');
+            const desc = document.getElementById('similar-desc');
+
+            section.style.display = 'block';
+            divider.style.display = 'flex';
+            desc.textContent = `Подбираем фильмы похожие на ваши ${likedIds.length} ${plural(likedIds.length)}...`;
+
+            grid.innerHTML = Array(10).fill(0).map(() => `
+    <div class="sk-card">
+      <div class="sk-card-poster"></div>
+      <div class="sk-card-body">
+        <div class="sk-card-line"></div>
+        <div class="sk-card-line s"></div>
+      </div>
+    </div>`).join('');
+
+            try {
+                // Пробуем эндпоинт by-likes
+                let movies = [];
+                const res = await fetch('/api/recommendations/by-likes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ movie_ids: likedIds, n: 50 })
+                });
+                if (res.ok) {
+                    movies = await res.json();
+                } else {
+                    // Фолбек — обычные рекомендации
+                    const res2 = await fetch('/api/recommendations?n=50', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res2.ok) movies = await res2.json();
+                }
+
+                // Исключаем уже лайкнутые
+                const likedSet = new Set(likedIds);
+                movies = movies.filter(m => !likedSet.has(m.movie_id || m.id));
+
+                document.getElementById('stat-rec').textContent = movies.length;
+                desc.textContent = `${movies.length} фильмов подобрано на основе вашего избранного`;
+
+                if (!movies.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--muted)">Не удалось найти похожие фильмы</div>';
+                    return;
+                }
+
+                renderSimilarGrid(movies);
+
+            } catch (e) {
+                grid.innerHTML = '';
+                section.style.display = 'none';
+                divider.style.display = 'none';
+            }
+        }
+
+        function renderSimilarGrid(movies) {
+            document.getElementById('similar-grid').innerHTML =
+                movies.map((m, i) => {
+                    const rating = m.rating ? Number(m.rating).toFixed(1) : null;
+                    const year = m.release_year || '';
+                    const genres = (m.genres || []).slice(0, 2).map(g => `<span class="g-tag">${g}</span>`).join('');
+                    const ml = matchLabel(m.similarity || 0);
+
+                    return `
+      <a class="movie-card" href="/movie.html?id=${m.movie_id}"
+         style="animation:cardIn .3s ${Math.min(i * .025, .5)}s ease both">
+        <div class="poster">
+          ${m.poster_url
+                            ? `<img src="${m.poster_url}" alt="${m.title || ''}" loading="lazy"
+                    onerror="this.parentElement.innerHTML='<div class=poster-ph>🎬</div>'">`
+                            : `<div class="poster-ph">🎬</div>`}
+          ${rating ? `<div class="score-badge">★ ${rating}</div>` : ''}
+        </div>
+        <div class="card-body">
+          <div class="card-title">${m.title || '—'}</div>
+          <div class="card-meta">
+            ${year ? `<span>${year}</span>` : ''}
+            ${year && rating ? `<span class="card-dot"></span>` : ''}
+            ${rating ? `<span>${rating}/10</span>` : ''}
+          </div>
+          <div class="card-genres">${genres}</div>
+          <span class="match-label ${ml.c}">${ml.t}</span>
+        </div>
+      </a>`;
+                }).join('');
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

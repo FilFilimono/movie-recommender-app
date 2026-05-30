@@ -8,8 +8,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 class AppConfig:
     
     DB_DIR: str = os.path.join(BASE_DIR, "backend", "database")   
-    # DB_PATH: str = os.path.join(DB_DIR, "app.db")
-    DB_PATH: str = "/app/data/app.db"
+    DB_PATH: str = os.path.join(DB_DIR, "app.db")
+    # DB_PATH: str = "/app/data/app.db"
     
     KNN_PATH: str = os.path.join(BASE_DIR, "data", "model", "transformers", "knn_model.joblib")
     TFIDF_PATH: str = os.path.join(BASE_DIR, "data", "model", "transformers", "tfidf.joblib")

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch — Рекомендации</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1c1c27;
+            --border: #2a2a3a;
+            --accent: #e8b34b;
+            --accent2: #c97d3f;
+            --text: #f0eeea;
+            --muted: #6b6b80;
+            --radius: 12px
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            min-height: 100vh
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(232, 179, 75, .05) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 48px;
+            background: rgba(10, 10, 15, .9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: .1em;
+            color: var(--accent)
+        }
+
+        .logo span {
+            color: var(--text)
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px
+        }
+
+        .nav-user {
+            font-size: .82rem;
+            color: var(--muted)
+        }
+
+        .btn-outline {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            display: inline-block
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn-logout:hover {
+            border-color: #e05252;
+            color: #e05252
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px 80px
+        }
+
+        .page-header {
+            margin-bottom: 32px
+        }
+
+        .page-eyebrow {
+            font-size: .72rem;
+            color: var(--accent);
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px
+        }
+
+        .page-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            letter-spacing: .04em;
+            margin-bottom: 8px
+        }
+
+        .page-subtitle {
+            font-size: .9rem;
+            color: var(--muted);
+            line-height: 1.6
+        }
+
+        .list-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px
+        }
+
+        .results-count {
+            font-size: .82rem;
+            color: var(--muted)
+        }
+
+        .results-count span {
+            color: var(--text);
+            font-weight: 600
+        }
+
+        .sort-select {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            font-size: .8rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px
+        }
+
+        .movie-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column
+        }
+
+        .movie-card:hover {
+            border-color: rgba(232, 179, 75, .4);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, .4)
+        }
+
+        .poster {
+            aspect-ratio: 2/3;
+            background: var(--surface2);
+            position: relative;
+            overflow: hidden
+        }
+
+        .poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform .3s
+        }
+
+        .movie-card:hover .poster img {
+            transform: scale(1.04)
+        }
+
+        .poster-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--border)
+        }
+
+        .score-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(10, 10, 15, .85);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(232, 179, 75, .3);
+            border-radius: 6px;
+            padding: 3px 7px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--accent)
+        }
+
+        .like-btn {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(10, 10, 15, .7);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: all .2s;
+            opacity: 0
+        }
+
+        .movie-card:hover .like-btn,
+        .like-btn.liked {
+            opacity: 1
+        }
+
+        .like-btn.liked {
+            background: rgba(232, 75, 75, .2);
+            border-color: rgba(232, 75, 75, .5)
+        }
+
+        .card-body {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        .card-title {
+            font-size: .88rem;
+            font-weight: 600;
+            line-height: 1.3
+        }
+
+        .card-meta {
+            font-size: .74rem;
+            color: var(--muted);
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .card-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--border)
+        }
+
+        .card-genres {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 4px
+        }
+
+        .genre-tag {
+            font-size: .64rem;
+            padding: 2px 7px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--muted)
+        }
+
+        /* Match label вместо sim-bar */
+        .match-label {
+            font-size: .68rem;
+            font-weight: 600;
+            margin-top: 8px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            letter-spacing: .02em
+        }
+
+        .match-great {
+            background: rgba(232, 179, 75, .15);
+            color: #e8b34b;
+            border: 1px solid rgba(232, 179, 75, .3)
+        }
+
+        .match-good {
+            background: rgba(123, 198, 126, .12);
+            color: #7bc67e;
+            border: 1px solid rgba(123, 198, 126, .3)
+        }
+
+        .match-ok {
+            background: rgba(107, 159, 212, .12);
+            color: #6b9fd4;
+            border: 1px solid rgba(107, 159, 212, .3)
+        }
+
+        .match-maybe {
+            background: rgba(107, 107, 128, .1);
+            color: #9b9bb0;
+            border: 1px solid rgba(107, 107, 128, .2)
+        }
+
+        /* Skeleton */
+        .skeleton-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden
+        }
+
+        .skeleton-poster {
+            aspect-ratio: 2/3;
+            background: var(--surface2);
+            animation: shimmer 1.5s infinite
+        }
+
+        .skeleton-body {
+            padding: 12px
+        }
+
+        .skeleton-line {
+            height: 12px;
+            border-radius: 4px;
+            background: var(--surface2);
+            animation: shimmer 1.5s infinite;
+            margin-bottom: 8px
+        }
+
+        .skeleton-line.short {
+            width: 60%
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                opacity: .4
+            }
+
+            50% {
+                opacity: .8
+            }
+        }
+
+        /* Empty */
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 80px 20px
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px
+        }
+
+        .empty-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 8px
+        }
+
+        .empty-desc {
+            font-size: .88rem;
+            color: var(--muted);
+            margin-bottom: 24px
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 13px 28px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius);
+            color: #0a0a0f;
+            font-family: 'Manrope', sans-serif;
+            font-size: .88rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: .05em;
+            text-transform: uppercase
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Cine<span>Match</span></div>
+        <div class="nav-right">
+            <span class="nav-user" id="nav-user"></span>
+            <a href="/search.html" class="btn-outline">🔍 Поиск</a>
+            <a href="/onboarding.html" class="btn-outline">⚙ Изменить вкус</a>
+            <a href="/favorites.html" class="btn-outline">🎬 Моё кино</a>
+            <button class="btn-outline" onclick="refreshRecs()">↻ Обновить</button>
+            <button class="btn-logout" onclick="logout()">Выйти</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="page-eyebrow">Персональные рекомендации</div>
+            <div class="page-title">Подобрано для вас</div>
+            <div class="page-subtitle" id="page-subtitle">Загружаем рекомендации...</div>
+        </div>
+
+        <div class="list-controls">
+            <div class="results-count">Найдено: <span id="count">—</span> фильмов</div>
+            <select class="sort-select" onchange="sortMovies(this.value)">
+                <option value="default">По релевантности</option>
+                <option value="rating">По рейтингу</option>
+                <option value="year">По году (новые)</option>
+                <option value="year_asc">По году (старые)</option>
+            </select>
+        </div>
+
+        <div id="movies-grid" class="movies-grid"></div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/index.html';
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('nav-user').textContent = 'Привет, ' + (user.username || '');
+
+        let allMovies = [];
+        let liked = new Set();
+
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+            } finally {
+                localStorage.clear();
+                window.location.href = '/index.html';
+            }
+        }
+
+        // function refreshRecs() {
+        //         sessionStorage.removeItem('recommendations');
+        //         loadRecommendations();
+        //     }
+
+        // Метка совпадения вместо процентов
+        function getMatchLabel(similarity) {
+            if (similarity >= 0.15) return { label: '✦ Отличное совпадение', cls: 'match-great' };
+            if (similarity >= 0.10) return { label: '✓ Хорошее совпадение', cls: 'match-good' };
+            if (similarity >= 0.05) return { label: '~ Похожий фильм', cls: 'match-ok' };
+            return { label: '◌ Возможно понравится', cls: 'match-maybe' };
+        }
+
+        function showSkeletons() {
+            document.getElementById('movies-grid').innerHTML =
+                Array(12).fill(0).map(() => `
+      <div class="skeleton-card">
+        <div class="skeleton-poster"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>`).join('');
+        }
+
+        async function loadRecommendations() {
+                
+                const navType = performance.getEntriesByType('navigation')[0]?.type;
+                const fromOnboarding = document.referrer.includes('onboarding');
+                if (navType === 'reload' || fromOnboarding) {
+                sessionStorage.removeItem('recs_cache');
+                }
+
+                // Есть кеш — используем (когда вернулись с карточки фильма)
+                const cached = sessionStorage.getItem('recs_cache');
+                if (cached) {
+                    try {
+                        const data = JSON.parse(cached);
+                        allMovies = data.movies;
+                        liked = new Set(data.liked || []);
+                        document.getElementById('page-subtitle').textContent = data.subtitle || '';
+                        renderMovies(allMovies);
+                        return;
+                    } catch (e) {
+                        sessionStorage.removeItem('recs_cache');
+                    }
+                }
+
+                // Нет кеша — загружаем с сервера
+                await fetchRecommendations();
+            }
+
+            async function fetchRecommendations(url = '/api/recommendations?n=100') {
+                showSkeletons();
+                try {
+                    const res = await fetch(url, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res.status === 401) { localStorage.clear(); window.location.href = '/index.html'; return; }
+                    if (res.status === 400) { window.location.href = '/onboarding.html'; return; }
+
+                    allMovies = await res.json();
+
+                    const likesRes = await fetch('/api/likes', { headers: { 'Authorization': 'Bearer ' + token } });
+                    if (likesRes.ok) liked = new Set((await likesRes.json()).movie_ids);
+
+                    const subtitle = await buildSubtitle();
+                    document.getElementById('page-subtitle').textContent = subtitle;
+
+                    // Сохраняем в кеш
+                    sessionStorage.setItem('recs_cache', JSON.stringify({
+                        movies: allMovies,
+                        liked: Array.from(liked),
+                        subtitle: subtitle,
+                    }));
+
+                    renderMovies(allMovies);
+                } catch (e) {
+                    document.getElementById('movies-grid').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">Ошибка загрузки</div>
+        <button class="btn-primary" onclick="fetchRecommendations()">Повторить</button>
+      </div>`;
+                }
+            }
+
+            async function buildSubtitle() {
+                try {
+                    const prefsRes = await fetch('/api/preferences', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (!prefsRes.ok) return 'Топ фильмы по вашим вкусам';
+                    const prefs = await prefsRes.json();
+                    if (!prefs) return 'Топ фильмы по вашим вкусам';
+                    const parts = [];
+                    if (prefs.genres?.length) parts.push(prefs.genres.join(', '));
+                    if (prefs.year_from) parts.push(prefs.year_from + '–' + prefs.year_to);
+                    if (prefs.min_rating) parts.push('рейтинг ' + prefs.min_rating + '+');
+                    if (prefs.certification) {
+                        const cm = { 'G': '0+', 'PG': 'PG', 'PG-13': '13+', 'R': '17+', 'NC-17': '18+' };
+                        const labels = prefs.certification.split(',')
+                            .map(c => cm[c.trim()] || c.trim()).join(', ');
+                        parts.push('возраст ' + labels);
+                    }
+                    return parts.length ? 'По критериям: ' + parts.join(' · ') : 'Топ фильмы по вашим вкусам';
+                } catch (e) {
+                    return 'Топ фильмы по вашим вкусам';
+                }
+            }
+
+            let currentOffset = 0;
+
+            async function refreshRecs() {
+                currentOffset += 100;
+                sessionStorage.removeItem('recs_cache');
+                await fetchRecommendations(`/api/recommendations?n=100&offset=${currentOffset}`);
+            }
+
+        function certLabel(cert) {
+            const map = { 'G': '0+', 'PG': 'PG', 'PG-13': '13+', 'R': '17+', 'NC-17': '18+', 'NR': 'NR', 'TV-MA': '17+' };
+            return map[cert] || cert;
+        }
+
+        function sortMovies(by) {
+                if (by === 'default') {
+                    renderMovies(allMovies);
+                    return;
+                }
+                const sorted = [...allMovies];
+                if (by === 'rating') sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                else if (by === 'year') sorted.sort((a, b) => (b.release_year || 0) - (a.release_year || 0));
+                else if (by === 'year_asc') sorted.sort((a, b) => (a.release_year || 0) - (b.release_year || 0));
+                renderMovies(sorted);
+            }
+
+        function renderMovies(movies) {
+            const grid = document.getElementById('movies-grid');
+            document.getElementById('count').textContent = movies.length;
+
+            if (!movies.length) {
+                grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🎬</div>
+        <div class="empty-title">Ничего не найдено</div>
+        <div class="empty-desc">Попробуйте изменить предпочтения</div>
+        <a href="/onboarding.html" class="btn-primary">Изменить вкус</a>
+      </div>`;
+                return;
+            }
+
+            grid.innerHTML = movies.map((m, i) => {
+                const match = getMatchLabel(m.similarity);
+                const rating = m.rating ? Number(m.rating).toFixed(1) : null;
+                const year = m.release_year || '';
+                const genres = (m.genres || []).slice(0, 2).map(g =>
+                    `<span class="genre-tag">${g}</span>`).join('');
+                const isLiked = liked.has(m.movie_id);
+
+                return `
+    <a class="movie-card" href="/movie.html?id=${m.movie_id}"
+       style="animation:cardIn .3s ${Math.min(i * 0.03, 0.5)}s ease both">
+      <div class="poster">
+        ${m.poster_url
+                        ? `<img src="${m.poster_url}" alt="${m.title}" loading="lazy"
+                  onerror="this.parentElement.innerHTML='<div class=poster-placeholder>🎬</div>'">`
+                        : `<div class="poster-placeholder">🎬</div>`}
+        ${rating ? `<div class="score-badge">★ ${rating}</div>` : ''}
+        <div class="like-btn ${isLiked ? 'liked' : ''}"
+             onclick="toggleLike(event,${m.movie_id},this)">
+          ${isLiked ? '♥' : '♡'}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${m.title || '—'}</div>
+        <div class="card-meta">
+          ${year ? `<span>${year}</span>` : ''}
+          ${year && rating ? `<span class="card-dot"></span>` : ''}
+          ${rating ? `<span>${rating}/10</span>` : ''}
+        </div>
+        <div class="card-genres">${genres}</div>
+        <span class="match-label ${match.cls}">${match.label}</span>
+      </div>
+    </a>`;
+            }).join('');
+        }
+
+        async function toggleLike(event, movieId, el) {
+            event.preventDefault(); event.stopPropagation();
+            const isLiked = liked.has(movieId);
+            try {
+                const res = await fetch(`/api/like/${movieId}`, {
+                    method: isLiked ? 'DELETE' : 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    if (isLiked) { liked.delete(movieId); el.textContent = '♡'; el.classList.remove('liked'); }
+                    else { liked.add(movieId); el.textContent = '♥'; el.classList.add('liked'); }
+                }
+            } catch (e) { }
+        }
+
+        loadRecommendations();
+    </script>
+</body>
+
+</html>

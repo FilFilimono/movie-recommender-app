@@ -56,22 +56,22 @@ def recommendations_by_likes(
         raise HTTPException(status_code=400, detail="Список пустой")
 
     movie_ids_map = _recommend_service._metadata.get_all_movie_ids()
-    id_to_idx     = {mid: i for i, mid in enumerate(movie_ids_map)}
-    matrix        = _recommend_service._engine._loader.feature_matrix
-    knn           = _recommend_service._engine._loader.knn
+    id_to_idx = {mid: i for i, mid in enumerate(movie_ids_map)}
+    matrix = _recommend_service._engine._loader.feature_matrix
+    knn = _recommend_service._engine._loader.knn
 
     indices = [id_to_idx[mid] for mid in body.movie_ids if mid in id_to_idx]
     if not indices:
         raise HTTPException(status_code=400, detail="Фильмы не найдены")
 
-    vecs    = matrix[indices]
+    vecs = matrix[indices]
     avg_vec = np.asarray(vecs.mean(axis=0))
     avg_vec = sk_normalize(avg_vec, norm='l2')
 
     n_search = min(body.n * 5, matrix.shape[0])
     distances, nbrs = knn.kneighbors(avg_vec, n_neighbors=n_search)
 
-    liked_set  = set(body.movie_ids)
+    liked_set = set(body.movie_ids)
     candidates = []
 
     for idx, dist in zip(nbrs[0], distances[0]):
@@ -83,39 +83,39 @@ def recommendations_by_likes(
         if not data or not data.get('poster_url'):
             continue
 
-        votes   = float(data.get('tmdb_votes')  or 0)
+        votes = float(data.get('tmdb_votes')  or 0)
         revenue = float(data.get('revenue')     or 0)
-        rating  = float(data.get('tmdb_rating') or 0)
-        budget  = float(data.get('budget')      or 0)
+        rating = float(data.get('tmdb_rating') or 0)
+        budget = float(data.get('budget')      or 0)
 
         if votes  < 500: continue
         if rating < 5.0: continue
 
         candidates.append({
             'movie_id': movie_id,
-            'data':     data,
-            'dist':     float(dist),
-            'votes':    votes,
-            'revenue':  revenue,
-            'rating':   rating,
-            'budget':   budget,
+            'data': data,
+            'dist': float(dist),
+            'votes':  votes,
+            'revenue': revenue,
+            'rating': rating,
+            'budget': budget,
         })
 
     if not candidates:
         return []
 
-    max_votes   = max(c['votes']   for c in candidates) or 1
+    max_votes = max(c['votes']   for c in candidates) or 1
     max_revenue = max(c['revenue'] for c in candidates) or 1
-    max_budget  = max(c['budget']  for c in candidates) or 1
+    max_budget = max(c['budget']  for c in candidates) or 1
 
     def quality_score(c):
         sim = float(max(0.0, 1.0 - c['dist']))
         return (
-            sim                          * 0.30 +
+            sim * 0.30 +
             (c['revenue'] / max_revenue) * 0.30 +
-            (c['votes']   / max_votes)   * 0.25 +
-            (c['rating']  / 10.0)        * 0.10 +
-            (c['budget']  / max_budget)  * 0.05
+            (c['votes']   / max_votes) * 0.25 +
+            (c['rating']  / 10.0) * 0.10 +
+            (c['budget']  / max_budget) * 0.05
         )
 
     candidates.sort(key=quality_score, reverse=True)

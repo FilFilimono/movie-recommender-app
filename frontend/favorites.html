@@ -290,8 +290,17 @@
         .sec-head {
             display: flex;
             align-items: center;
-            gap: 14px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
             margin-bottom: 8px;
+        }
+
+        .sec-title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
         }
 
         .sec-title {
@@ -321,6 +330,30 @@
             background: linear-gradient(135deg, rgba(232, 179, 75, 0.15), rgba(255, 107, 74, 0.08));
             color: var(--accent);
             border: 1px solid rgba(232, 179, 75, 0.25);
+        }
+
+        .refresh-btn {
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: rgba(19, 19, 26, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            background: rgba(232, 179, 75, 0.1);
         }
 
         .sec-desc {
@@ -493,19 +526,7 @@
 
         .empty-fav-icon {
             font-size: 4rem;
-            animation: bounce 2s ease infinite;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
+            opacity: 0.7;
         }
 
         .empty-fav-title {
@@ -675,21 +696,6 @@
             opacity: 1;
             background: linear-gradient(135deg, #e05252, #c93a3a);
             border-color: #ff6b6b;
-            animation: heartBeat 0.3s ease;
-        }
-
-        @keyframes heartBeat {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.3);
-            }
-
-            100% {
-                transform: scale(1);
-            }
         }
 
         .card-body {
@@ -950,7 +956,8 @@
             }
 
             .sec-head {
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
     </style>
@@ -963,9 +970,9 @@
         <a href="/recommendations.html" class="logo">Cine<span>Match</span></a>
         <div class="nav-r">
             <span style="font-size:0.8rem;color:var(--muted)" id="nav-user"></span>
-            <a href="/recommendations.html" class="nav-btn">★ Рекомендации</a>
-            <a href="/search.html" class="nav-btn">🔍 Поиск</a>
-            <a href="/favorites.html" class="nav-btn active">🎬 Моё кино</a>
+            <a href="/recommendations.html" class="nav-btn">Рекомендации</a>
+            <a href="/search.html" class="nav-btn">Поиск</a>
+            <a href="/favorites.html" class="nav-btn active">Моё кино</a>
             <button class="nav-btn danger" onclick="logout()">Выйти</button>
         </div>
     </nav>
@@ -993,8 +1000,10 @@
 
         <!-- ИЗБРАННОЕ -->
         <div class="sec-head">
-            <div class="sec-title">❤ Избранное</div>
-            <span class="sec-badge badge-liked" id="liked-badge" style="display:none"></span>
+            <div class="sec-title-group">
+                <div class="sec-title">Избранное</div>
+                <span class="sec-badge badge-liked" id="liked-badge" style="display:none"></span>
+            </div>
         </div>
         <div class="sec-desc">Наведите на постер, чтобы убрать фильм из избранного</div>
         <div id="liked-section"></div>
@@ -1002,15 +1011,18 @@
         <!-- РАЗДЕЛИТЕЛЬ (скрыт пока нет лайков) -->
         <div class="divider" id="divider" style="display:none">
             <div class="div-line"></div>
-            <div class="div-text">✦ потому что вам понравилось ✦</div>
+            <div class="div-text">потому что вам понравилось</div>
             <div class="div-line"></div>
         </div>
 
         <!-- ПОХОЖИЕ -->
         <div id="similar-section" style="display:none">
             <div class="sec-head">
-                <div class="sec-title">Вам также понравится</div>
-                <span class="sec-badge badge-similar">На основе вашего вкуса</span>
+                <div class="sec-title-group">
+                    <div class="sec-title">Вам также понравится</div>
+                    <span class="sec-badge badge-similar">На основе вашего вкуса</span>
+                </div>
+                <button class="refresh-btn" onclick="refreshSimilar()">↻ Обновить</button>
             </div>
             <div class="sec-desc" id="similar-desc"></div>
             <div id="similar-grid" class="movies-grid"></div>
@@ -1024,7 +1036,7 @@
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         document.getElementById('nav-user').textContent = 'Привет, ' + (user.username || '');
 
-        let likedIds = new Set(); // Используем Set для быстрого поиска
+        let likedIds = new Set();
         let likedMovies = [];
 
         async function logout() {
@@ -1040,12 +1052,11 @@
         }
 
         function matchLabel(sim) {
-            if (sim >= 0.15) return { t: '✦ Отличное совпадение', c: 'ml-great' };
-            if (sim >= 0.08) return { t: '✓ Хорошее совпадение', c: 'ml-good' };
-            return { t: '◌ Возможно понравится', c: 'ml-ok' };
+            if (sim >= 0.15) return { t: 'Отличное совпадение', c: 'ml-great' };
+            if (sim >= 0.08) return { t: 'Хорошее совпадение', c: 'ml-good' };
+            return { t: 'Возможно понравится', c: 'ml-ok' };
         }
 
-        // ── Функция для лайка из сетки рекомендаций ──
         async function toggleLikeFromGrid(movieId, btnElement) {
             const isLiked = likedIds.has(movieId);
 
@@ -1064,18 +1075,10 @@
                         likedIds.add(movieId);
                         btnElement.classList.add('liked-card');
                         btnElement.textContent = '♥';
-
-                        // Анимация сердечка
-                        btnElement.style.animation = 'none';
-                        setTimeout(() => {
-                            btnElement.style.animation = 'heartBeat 0.3s ease';
-                        }, 10);
                     }
 
-                    // Обновляем счетчик
                     document.getElementById('stat-liked').textContent = likedIds.size;
 
-                    // Обновляем бейдж
                     const badge = document.getElementById('liked-badge');
                     if (likedIds.size > 0) {
                         badge.textContent = likedIds.size + ' ' + plural(likedIds.size);
@@ -1084,16 +1087,12 @@
                         badge.style.display = 'none';
                     }
 
-                    // Если лайкнули новый фильм, обновляем список избранного
                     if (!isLiked) {
-                        // Загружаем данные фильма и добавляем в избранное
                         const movieRes = await fetch(`/api/movie/${movieId}`);
                         if (movieRes.ok) {
                             const movie = await movieRes.json();
                             likedMovies.unshift(movie);
                             renderLikedScroll(likedMovies);
-
-                            // Если раньше не было лайков, показываем разделитель и загружаем рекомендации
                             if (likedIds.size === 1) {
                                 document.getElementById('divider').style.display = 'flex';
                                 document.getElementById('similar-section').style.display = 'block';
@@ -1107,7 +1106,6 @@
             }
         }
 
-        // ── Главная загрузка ──
         async function init() {
             showLikedSkeletons();
 
@@ -1118,7 +1116,6 @@
                 const likedArray = data.movie_ids || [];
                 likedIds = new Set(likedArray);
 
-                // Обновляем статистику
                 document.getElementById('stat-liked').textContent = likedIds.size;
 
                 if (!likedIds.size) {
@@ -1126,12 +1123,10 @@
                     return;
                 }
 
-                // Показываем badge
                 const badge = document.getElementById('liked-badge');
                 badge.textContent = likedIds.size + ' ' + plural(likedIds.size);
                 badge.style.display = 'inline-block';
 
-                // Загружаем данные фильмов параллельно
                 const results = await Promise.allSettled(
                     Array.from(likedIds).map(id =>
                         fetch(`/api/movie/${id}`).then(r => r.ok ? r.json() : null)
@@ -1170,7 +1165,7 @@
       <div>
         <div class="empty-fav-title">Здесь пока ничего нет</div>
         <div class="empty-fav-desc">
-          Нажмите ♡ на карточке любого фильма — он появится здесь.<br>
+          Нажмите ♡ на карточке любого фильма — он появится здесь.
           Чем больше фильмов вы добавите, тем точнее будут рекомендации.
         </div>
         <a href="/recommendations.html" class="btn-go">Смотреть рекомендации</a>
@@ -1228,10 +1223,8 @@
                     document.getElementById('similar-section').style.display = 'none';
                 } else {
                     renderLikedScroll(likedMovies);
-                    // Обновляем сетку рекомендаций (убираем лайкнутый фильм и обновляем состояние кнопок)
                     loadSimilar();
                 }
-                // Обновляем бейдж
                 const badge = document.getElementById('liked-badge');
                 if (likedIds.size > 0) {
                     badge.textContent = likedIds.size + ' ' + plural(likedIds.size);
@@ -1242,7 +1235,12 @@
             }, 260);
         }
 
-        // ── Загрузка похожих ──
+        // Функция обновления рекомендаций (кнопка Обновить)
+        async function refreshSimilar() {
+            if (likedIds.size === 0) return;
+            await loadSimilar();
+        }
+
         async function loadSimilar() {
             const section = document.getElementById('similar-section');
             const divider = document.getElementById('divider');
@@ -1284,7 +1282,6 @@
                     if (res2.ok) movies = await res2.json();
                 }
 
-                // Исключаем уже лайкнутые
                 movies = movies.filter(m => !likedIds.has(m.movie_id || m.id));
 
                 document.getElementById('stat-rec').textContent = movies.length;
